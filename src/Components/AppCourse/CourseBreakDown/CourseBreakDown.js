@@ -40,20 +40,6 @@ const originData = [
     courseId: "Chem7",
     teacher: `Not Assigned`,
   },
-  // {
-  //   key: Math.random(),
-  //   courseName: `Biology G8`,
-  //   grade: "Grade 8",
-  //   courseId: "Biol7",
-  //   teacher: `Not Assigned`,
-  // },
-  // {
-  //   key: Math.random(),
-  //   courseName: `Mathemathics G2`,
-  //   grade: "Grade 2",
-  //   courseId: "Math2",
-  //   teacher: `Not Assigned`,
-  // },
   {
     key: Math.random(),
     courseName: `English`,

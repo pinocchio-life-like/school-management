@@ -14,66 +14,106 @@ import Title from "antd/es/typography/Title";
 // import { EditFilled, CloseOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import "./TeacherList.css";
-// import CourseSearchForm from "./CourseSearchForm/CourseSearchForm";
+// import coursesIdearchForm from "./coursesIdearchForm/coursesIdearchForm";
 const { Search } = Input;
 const { Option } = Select;
 
 const originData = [
   {
     key: Math.random(),
-    courseName: `Mathemathics`,
-    grade: "Grade 1",
-    courseId: "Math1",
-    teacher: `Not Assigned`,
+    teacherName: `Tesfa Daba`,
+    grade: (
+      <>
+        <p>Grade 7</p> <p>Grade 8</p>
+      </>
+    ),
+    coursesId: (
+      <>
+        <p>MathG7</p>
+        <p>PhysG8</p>
+      </>
+    ),
+    status: `Not Assigned`,
   },
   {
     key: Math.random(),
-    courseName: `English`,
-    grade: "Grade 1",
-    courseId: "Engl1",
-    teacher: `Not Assigned`,
+    teacherName: `Kifle Yilma`,
+    grade: (
+      <>
+        <p>Grade 7</p> <p>Grade 8</p>
+      </>
+    ),
+    coursesId: (
+      <>
+        <p>MathG7</p>
+        <p>PhysG8</p>
+      </>
+    ),
+    status: `Not Assigned`,
   },
   {
     key: Math.random(),
-    courseName: `Chemistry`,
-    grade: "Grade 7",
-    courseId: "Chem7",
-    teacher: `Not Assigned`,
-  },
-  // {
-  //   key: Math.random(),
-  //   courseName: `Biology G8`,
-  //   grade: "Grade 8",
-  //   courseId: "Biol7",
-  //   teacher: `Not Assigned`,
-  // },
-  // {
-  //   key: Math.random(),
-  //   courseName: `Mathemathics G2`,
-  //   grade: "Grade 2",
-  //   courseId: "Math2",
-  //   teacher: `Not Assigned`,
-  // },
-  {
-    key: Math.random(),
-    courseName: `English`,
-    grade: "Grade 5",
-    courseId: "Engl5",
-    teacher: `Not Assigned`,
+    teacherName: `Alemu Addis`,
+    grade: (
+      <>
+        <p>Grade 7</p> <p>Grade 8</p>
+      </>
+    ),
+    coursesId: (
+      <>
+        <p>MathG7</p>
+        <p>PhysG8</p>
+      </>
+    ),
+    status: `Not Assigned`,
   },
   {
     key: Math.random(),
-    courseName: `Biology`,
-    grade: "Grade 7",
-    courseId: "Biol7",
-    teacher: `Not Assigned`,
+    teacherName: `Mulugeta hailu`,
+    grade: (
+      <>
+        <p>Grade 7</p> <p>Grade 8</p>
+      </>
+    ),
+    coursesId: (
+      <>
+        <p>MathG7</p>
+        <p>PhysG8</p>
+      </>
+    ),
+    status: `Not Assigned`,
   },
   {
     key: Math.random(),
-    courseName: `Chemistry `,
-    grade: "Grade 8",
-    courseId: "ChemG8",
-    teacher: `Not Assigned`,
+    teacherName: `Hulu Kebede`,
+    grade: (
+      <>
+        <p>Grade 7</p> <p>Grade 8</p>
+      </>
+    ),
+    coursesId: (
+      <>
+        <p>MathG7</p>
+        <p>PhysG8</p>
+      </>
+    ),
+    status: `Not Assigned`,
+  },
+  {
+    key: Math.random(),
+    teacherName: `Islam Sobhi`,
+    grade: (
+      <>
+        <p>Grade 7</p> <p>Grade 8</p>
+      </>
+    ),
+    coursesId: (
+      <>
+        <p>MathG7</p>
+        <p>PhysG8</p>
+      </>
+    ),
+    status: `Not Assigned`,
   },
 ];
 
@@ -104,15 +144,15 @@ const EditableCell = ({
             },
           ]}>
           {dataIndex === "grade" ? (
-            <Select placeholder="Select Teacher">
+            <Select disabled placeholder="Cannot Edit">
               <Option value="Grade 1">Grade 1</Option>
               <Option value="Grade 2">Grade 2</Option>
               <Option value="Grade 3">Grade 3</Option>
             </Select>
-          ) : dataIndex === "teacher" ? (
+          ) : dataIndex === "status" ? (
             <Input readOnly />
-          ) : dataIndex === "courseId" ? (
-            <Input readOnly />
+          ) : dataIndex === "coursesId" ? (
+            <Select placeholder="Cannot Edit" disabled />
           ) : (
             <Input />
           )}
@@ -129,19 +169,20 @@ const TeacherList = () => {
   const navigate = useNavigate();
   const [addForm] = Form.useForm();
   const [editingKey, setEditingKey] = useState("");
-  const [courseIdValue, setCourseIdValue] = useState("none");
-  const [courseNameForId, setCourseNameForId] = useState("");
+  const [coursesIdValue, setcoursesIdValue] = useState("none");
+  const [teacherNameForId, setteacherNameForId] = useState("");
   const isEditing = (record) => record.key === editingKey;
   const [messageApi, contextHolder] = message.useMessage();
   const [filteredData, setFilteredData] = useState(originData);
+  const [coursesForGradeRender, setCoursesForGradeRender] = useState([]);
 
   // edit start start
   const edit = (record) => {
     form.setFieldsValue({
-      courseName: "",
+      teacherName: "",
       grade: "",
-      courseId: "",
-      teacher: "",
+      coursesId: "",
+      status: "",
       ...record,
     });
     setEditingKey(record.key);
@@ -194,9 +235,16 @@ const TeacherList = () => {
 
   const columns = [
     {
-      title: "Course Name",
-      dataIndex: "courseName",
+      title: "Teacher Name",
+      dataIndex: "teacherName",
       width: "21%",
+      editable: true,
+      Assignable: true,
+    },
+    {
+      title: "courses Id",
+      dataIndex: "coursesId",
+      width: "14%",
       editable: true,
       Assignable: true,
     },
@@ -208,15 +256,8 @@ const TeacherList = () => {
       Assignable: true,
     },
     {
-      title: "Course Id",
-      dataIndex: "courseId",
-      width: "14%",
-      editable: true,
-      Assignable: true,
-    },
-    {
-      title: "Teacher",
-      dataIndex: "teacher",
+      title: "Status",
+      dataIndex: "status",
       width: "25%",
       editable: true,
       Assignable: true,
@@ -274,7 +315,7 @@ const TeacherList = () => {
       ...col,
       onCell: (record) => ({
         record,
-        inputType: col.dataIndex === "grade" ? "number" : "text",
+        inputType: "text",
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isEditing(record),
@@ -287,37 +328,77 @@ const TeacherList = () => {
   // const [expandable, setExpandable] = useState(true);
 
   const onFinish = (values) => {
-    originData.push({
+    // console.log(values);
+    const coursesId = [];
+    Object.entries(values).forEach(([key, value]) => {
+      console.log(key, value);
+      if (key.slice(1) === "Courses") {
+        coursesId.push(<p>{value}</p>);
+      }
+    });
+    const grades = values.grade.map((grade) => {
+      return <p>{grade}</p>;
+    });
+    originData.unshift({
       key: Math.random(),
-      courseName: `${values.courseName}`,
-      grade: `${values.grade}`,
-      courseId: `${courseIdValue}`,
-      teacher: `Not Assigned`,
+      teacherName: `${values.teacherName}`,
+      grade: grades,
+      coursesId: coursesId,
+      status: `Not Assigned`,
     });
     success();
-    // console.log("Finish:", values, courseIdValue);
+    // // console.log("Finish:", values, coursesIdValue);
     setFilteredData([...originData]);
   };
   const onGradeSelectChange = (value) => {
-    const gradeforId = value
-      .substring(value.length - 1, value.length)
-      .toUpperCase();
-    setCourseIdValue(`${courseNameForId}G${gradeforId}`);
+    const coursesForGrade = [];
+    for (let i = 0; i < value.length; i++) {
+      coursesForGrade.push(
+        <Form.Item
+          label={`${value[i]} Courses`}
+          style={{ minWidth: 250, textAlign: "left", marginTop: -20 }}
+          name={`${value[i].slice(-1)}Courses`}
+          rules={[
+            {
+              required: true,
+              message: "Please select Courses!",
+            },
+          ]}>
+          <Select
+            mode="multiple"
+            allowClear
+            style={{ marginTop: -25 }}
+            onSelect={(values) => {
+              console.log(values);
+            }}
+            placeholder="Select Courses">
+            <Option value={`MathG${value[i].slice(-1)}`}>Mathemathics</Option>
+            <Option value={`EnglG${value[i].slice(-1)}`}>English</Option>
+            <Option value={`ChemG${value[i].slice(-1)}`}>Chemistry</Option>
+            <Option value={`BiolG${value[i].slice(-1)}`}>Biology</Option>
+            <Option value={`PhysG${value[i].slice(-1)}`}>Physics</Option>
+            <Option value={`HistG${value[i].slice(-1)}`}>Hisory</Option>
+            <Option value={`OtheG${value[i].slice(-1)}`}>Other</Option>
+          </Select>
+        </Form.Item>
+      );
+    }
+    setCoursesForGradeRender([...coursesForGrade]);
   };
-  const onCourseNameChange = (e) => {
-    const courseName = e.target.value;
-    setCourseNameForId(() => {
-      return courseName.substring(0, 4).toUpperCase();
+  const onteacherNameChange = (e) => {
+    const teacherName = e.target.value;
+    setteacherNameForId(() => {
+      return teacherName.substring(0, 4).toUpperCase();
     });
-    setCourseIdValue(() => {
-      return courseName.substring(0, 4).toUpperCase();
+    setcoursesIdValue(() => {
+      return teacherName.substring(0, 4).toUpperCase();
     });
   };
 
   const onSearch = (values) => {
     let searchText = values;
-    let courseName = filteredData.map((name) => {
-      return name.courseName;
+    let teacherName = filteredData.map((name) => {
+      return name.teacherName;
     });
     let grade = filteredData.map((grade) => {
       return grade.grade;
@@ -325,7 +406,7 @@ const TeacherList = () => {
 
     const courseListByName = originData.filter((list, i) => {
       return searchText.toLowerCase() ===
-        courseName[i].substring(0, searchText.length).toLowerCase()
+        teacherName[i].substring(0, searchText.length).toLowerCase()
         ? list
         : "";
     });
@@ -355,7 +436,7 @@ const TeacherList = () => {
       <div class="CourseAddContainer">
         <div class="CourseAddTitle">
           <Title level={3} style={{ textAlign: "left", marginBottom: 10 }}>
-            Add Course
+            Add Teacher
           </Title>
         </div>
         <Form
@@ -365,20 +446,20 @@ const TeacherList = () => {
           layout="vertical"
           onFinish={onFinish}>
           <Form.Item
-            label="Course Name"
+            label="Teacher Name"
             style={{ minWidth: 250 }}
-            name="courseName"
+            name="teacherName"
             rules={[
               {
                 required: true,
-                message: "Please input course name!",
+                message: "Please input Teacher name!",
               },
             ]}>
             <Input
               style={{ marginTop: -25 }}
-              onChange={onCourseNameChange}
+              onChange={onteacherNameChange}
               type="text"
-              placeholder="Course Name"
+              placeholder="Teacher Name"
             />
           </Form.Item>
           <Form.Item
@@ -392,8 +473,10 @@ const TeacherList = () => {
               },
             ]}>
             <Select
+              mode="multiple"
+              allowClear
               style={{ marginTop: -25 }}
-              onSelect={onGradeSelectChange}
+              onChange={onGradeSelectChange}
               placeholder="Select Grade">
               <Option value="Grade 1">Grade 1</Option>
               <Option value="Grade 2">Grade 2</Option>
@@ -402,14 +485,15 @@ const TeacherList = () => {
               <Option value="Grade 5">Grade 5</Option>
             </Select>
           </Form.Item>
+          {coursesForGradeRender}
           <Form.Item
-            label="Course ID"
+            label="Status"
             style={{ minWidth: 250, marginTop: -20 }}
-            name="courseId"
+            name="status"
             rules={[
               {
                 required: false,
-                message: "Please input courseId!",
+                message: "Please input coursesId!",
               },
             ]}>
             <div
@@ -427,11 +511,11 @@ const TeacherList = () => {
               // type="text"
               // placeholder="Course Id"
             >
-              <strong>{courseIdValue}</strong>
+              <strong>Not Assigned</strong>
             </div>
           </Form.Item>
 
-          <div class="CourseSaveButton">
+          <div class="coursesIdaveButton">
             <Form.Item shouldUpdate>
               {() => (
                 <Button
@@ -448,7 +532,7 @@ const TeacherList = () => {
       <div class="CourseListContainer">
         <div class="CourseListTitle">
           <Title level={3} style={{ textAlign: "left", marginBottom: 10 }}>
-            Course List
+            Teacher List
           </Title>
           <div
             style={{
@@ -471,7 +555,7 @@ const TeacherList = () => {
               }}
               type="primary"
               style={{ marginLeft: 5 }}>
-              Offer Courses
+              Assign Teacher
             </Button>
           </div>
         </div>
