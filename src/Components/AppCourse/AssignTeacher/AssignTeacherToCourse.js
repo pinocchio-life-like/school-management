@@ -428,7 +428,7 @@ const AssignTeacherToCourse = () => {
             <Popconfirm
               title="Sure want to delete?"
               onConfirm={() => {
-                // deleteCourse(record);
+                deleteCourse(record);
               }}>
               <a>Delete</a>
             </Popconfirm>
@@ -468,6 +468,12 @@ const AssignTeacherToCourse = () => {
   //on Change Checkbox
   const onChangeCheckBox = (checkedValues) => {
     console.log("checked = ", checkedValues);
+  };
+  //Delete handler
+  const deleteCourse = (record) => {
+    const indexValue = tableData.indexOf(record);
+    tableData.splice(indexValue, 1);
+    setTableData([...tableData]);
   };
 
   return (
