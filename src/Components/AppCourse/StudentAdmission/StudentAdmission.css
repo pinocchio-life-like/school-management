@@ -36,7 +36,6 @@
 }
 
 .AddPhoto {
-
     height: 260px;
     width: 260px;
     grid-area: AddPhoto;
@@ -66,8 +65,7 @@
 
 .ParentDetailName {
     background-color: rgba(13, 24, 77, 0.197);
-
-
+    margin-right: 33px;
     grid-area: ParentDetailName;
 }
 

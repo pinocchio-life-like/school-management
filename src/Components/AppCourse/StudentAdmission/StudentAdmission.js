@@ -114,13 +114,18 @@ const StudentAdmission = () => {
                   onChange={(key) => {
                     console.log(key);
                   }}>
-                  <Panel header="Add Sibling" key="1">
-                    <Col>
-                      <Form.Item name="siblingClass">
-                        <div style={{ textAlign: "left", margin: -2.55 }}>
-                          Class
-                        </div>
-                        <Row>
+                  <Panel
+                    style={{ textAlign: "left" }}
+                    header="Add Sibling"
+                    key="1">
+                    <Col style={{ width: "100%" }}>
+                      <div style={{ textAlign: "left", margin: -2.55 }}>
+                        Class
+                      </div>
+                      <Row>
+                        <Form.Item
+                          name="siblingClass"
+                          style={{ width: "100%" }}>
                           <Select
                             style={{ textAlign: "left" }}
                             placeholder="Select Class">
@@ -132,29 +137,31 @@ const StudentAdmission = () => {
                             <Option value="Grade 6">Grade 6</Option>
                             <Option value="Grade 7">Grade 7</Option>
                           </Select>
-                        </Row>
-                      </Form.Item>
-                      <Form.Item name="siblingSection">
-                        <div style={{ textAlign: "left", margin: 0 }}>
-                          Section
-                        </div>
-                        <Row>
+                        </Form.Item>
+                      </Row>
+                      <div style={{ textAlign: "left", margin: 0 }}>
+                        Section
+                      </div>
+                      <Row>
+                        <Form.Item
+                          name="siblingSection"
+                          style={{ width: "100%" }}>
                           <Select
-                            style={{ textAlign: "left" }}
+                            style={{ textAlign: "left", width: "100%" }}
                             placeholder="Select Section">
                             <Option value="A">A</Option>
                             <Option value="B">B</Option>
                             <Option value="C">C</Option>
                             <Option value="D">D</Option>
                           </Select>
-                        </Row>
-                      </Form.Item>
-                      <Form.Item name="siblingName">
-                        <div style={{ textAlign: "left", margin: 0 }}>Name</div>
-                        <Row>
+                        </Form.Item>
+                      </Row>
+                      <div style={{ textAlign: "left", margin: 0 }}>Name</div>
+                      <Row>
+                        <Form.Item name="siblingName" style={{ width: "100%" }}>
                           <Input placeholder="Enter Name" />
-                        </Row>
-                      </Form.Item>
+                        </Form.Item>
+                      </Row>
                     </Col>
                   </Panel>
                 </Collapse>
