@@ -10,14 +10,8 @@
         "PhotoAndSibling ParentDetail ParentDetail";
 }
 
-.StudentAddmissionTitle {
-    border: 1px solid salmon;
-    grid-area: StudentAddmissionTitle;
-}
 
 .PhotoAndSibling {
-    border: 1px solid salmon;
-
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1.3fr 0.1fr 1.6fr;
@@ -25,37 +19,38 @@
     grid-auto-flow: row;
     grid-template-areas:
         "AddPhoto AddPhoto AddPhoto"
-        "AddSibling AddSibling AddSibling"
+        "SiblingInfo SiblingInfo SiblingInfo"
         "SiblingInfo SiblingInfo SiblingInfo";
     grid-area: PhotoAndSibling;
 }
 
-.AddPhoto {
-    border: 1px solid salmon;
-
-    grid-area: AddPhoto;
-}
-
-.AddSibling {
-    border: 1px solid salmon;
-
-    grid-area: AddSibling;
-}
-
 .SiblingInfo {
-    border: 1px solid salmon;
-
+    background-color: rgba(13, 24, 77, 0.197);
+    margin-bottom: 25px;
     grid-area: SiblingInfo;
 }
 
+.StudentAddmissionTitle {
+
+    grid-area: StudentAddmissionTitle;
+}
+
+.AddPhoto {
+
+    height: 260px;
+    width: 260px;
+    grid-area: AddPhoto;
+}
+
+
 .StudentAddForm {
-    border: 1px solid salmon;
+
 
     grid-area: StudentAddForm;
 }
 
 .ParentDetail {
-    border: 1px solid salmon;
+
 
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -70,13 +65,34 @@
 }
 
 .ParentDetailName {
-    border: 1px solid salmon;
+    background-color: rgba(13, 24, 77, 0.197);
+
 
     grid-area: ParentDetailName;
 }
 
 .ParentDetailForm {
-    border: 1px solid salmon;
+
 
     grid-area: ParentDetailForm;
+}
+
+.setSizeClassName .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item {
+    height: 260px;
+    width: 260px;
+    margin-left: -75px;
+}
+
+.setUploadSize .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select {
+    width: 260px;
+    height: 260px;
+    margin-inline-end: 8px;
+    margin-bottom: 8px;
+    text-align: center;
+    vertical-align: top;
+    background-color: rgba(13, 24, 77, 0.197);
+    border: 1px dashed #d9d9d9;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.3s;
 }
