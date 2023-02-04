@@ -1,0 +1,50 @@
+.StudentDetailContainerCss {
+    display: grid;
+    grid-template-columns: 0.7fr 1.3fr 1fr;
+    grid-template-rows: 0.1fr 0.4fr 2.6fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+        "StudentListTitle StudentListTitle StudentListTitle"
+        "ProfilePhoto RoughDetail RoughDetail"
+        "TabsAndDetail TabsAndDetail TabsAndDetail";
+}
+
+.StudentDetailTitle {
+    border: 1px solid salmon;
+    grid-area: StudentListTitle;
+}
+
+.TabsAndDetail {
+    border: 1px solid salmon;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 0.1fr 2.3fr 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+        "AvailableTabs AvailableTabs AvailableTabs"
+        "TabDetail TabDetail TabDetail"
+        "TabDetail TabDetail TabDetail";
+    grid-area: TabsAndDetail;
+}
+
+.AvailableTabs {
+    border: 1px solid salmon;
+    grid-area: AvailableTabs;
+}
+
+.TabDetail {
+    border: 1px solid salmon;
+    grid-area: TabDetail;
+}
+
+.ProfilePhoto {
+    border: 1px solid salmon;
+    grid-area: ProfilePhoto;
+}
+
+.RoughDetail {
+    border: 1px solid salmon;
+    grid-area: RoughDetail;
+}

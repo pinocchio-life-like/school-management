@@ -10,6 +10,8 @@ import EditCourse from "../AppCourse/TestPages/EditCourse";
 import AddCourse from "../AppCourse/TestPages/AddCourse";
 import TeacherList from "../AppCourse/TeacherList/TeacherList";
 import StudentAdmission from "../AppCourse/StudentAdmission/StudentAdmission";
+import StudentDetail from "../AppCourse/StudentDetails/StudentDetail";
+import StudentsList from "../AppCourse/StudentsList/StudentsList";
 
 const AppRoute = () => {
   return (
@@ -25,6 +27,8 @@ const AppRoute = () => {
         <Route path="/courseGroup" element={<CourseGroup />} />
         <Route path="/teacherList" element={<TeacherList />} />
         <Route path="/studentAdmission" element={<StudentAdmission />} />
+        <Route path="/studentDetail" element={<StudentDetail />} />
+        <Route path="/studentsList" element={<StudentsList />} />
       </Routes>
     </div>
   );

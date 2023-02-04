@@ -14,6 +14,7 @@ function getItem(label, key, icon, children) {
 const items = [
   getItem("Student", "sub1", <TeamOutlined />, [
     getItem("Student Admission", "/studentAdmission"),
+    getItem("Students List", "/studentsList"),
   ]),
   getItem("Teacher", "sub2", <TeamOutlined />, [
     getItem("Assign Teacher", "/assignTeacher"),
