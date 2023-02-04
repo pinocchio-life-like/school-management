@@ -11,12 +11,14 @@
 }
 
 .StudentListTitle {
-    border: 1px solid salmon;
+    background-color: rgba(0, 15, 29, 0.1);
+    border-top-left-radius: 9px;
     grid-area: StudentListTitle;
 }
 
 .StudentListSearch {
-    border: 1px solid salmon;
+    background-color: rgba(00, 15, 29, 0.1);
+    border-top-right-radius: 9px;
     grid-area: StudentListSearch;
 }
 
@@ -31,6 +33,5 @@
 }
 
 .StudentListTableContainer {
-    border: 1px solid salmon;
     grid-area: StudentListTableContainer;
 }

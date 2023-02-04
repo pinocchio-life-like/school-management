@@ -1,6 +1,7 @@
 import {
   Button,
   Form,
+  Image,
   Input,
   Popconfirm,
   Select,
@@ -16,7 +17,7 @@ const { Option } = Select;
 const originData = [
   {
     key: Math.random(),
-    studentName: `Mathemathics`,
+    studentName: `John Wick`,
     studentId: "ELEM32023",
     grade: "Grade 1",
     section: "A",
@@ -24,11 +25,12 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage:
+      "https://s3.amazonaws.com/media.thecrimson.com/photos/2014/11/07/202918_1301040.jpg",
   },
   {
     key: Math.random(),
-    studentName: `English`,
+    studentName: `Nairobi Shoan`,
     studentId: "ELEM32023",
     grade: "Grade 1",
     section: "A",
@@ -36,11 +38,12 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage:
+      "https://cdn.dribbble.com/users/1306069/screenshots/11105138/media/dc177a1a6d655f48d90812e5389bcb85.jpg?compress=1&resize=1000x750&vertical=top",
   },
   {
     key: Math.random(),
-    studentName: `Physical Education`,
+    studentName: `Adams Kent`,
     studentId: "ELEM32023",
     grade: "Grade 1",
     section: "A",
@@ -48,11 +51,12 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage:
+      "https://www.etstours.com/images/r/adam-kent_updated-new/480x480g1278-0-4683-3405/adam-kent_updated-new.jpg",
   },
   {
     key: Math.random(),
-    studentName: `Art and Music`,
+    studentName: `Bohr Castle`,
     studentId: "ELEM32023",
     grade: "Grade 1",
     section: "A",
@@ -60,11 +64,12 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage:
+      "https://d2jyir0m79gs60.cloudfront.net/news/images/successful-college-student-lg.png",
   },
   {
     key: Math.random(),
-    studentName: `Physical Education`,
+    studentName: `Islam Sobhi`,
     studentId: "ELEM32023",
     grade: "Grade 2",
     section: "A",
@@ -72,11 +77,12 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage:
+      "https://i2.wp.com/rollercoasteryears.com/wp-content/uploads/Thrive-During-Finals-.jpg?resize=1000%2C667&ssl=1",
   },
   {
     key: Math.random(),
-    studentName: `English`,
+    studentName: `Omar Hisham`,
     studentId: "ELEM32023",
     grade: "Grade 2",
     section: "A",
@@ -84,11 +90,12 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage:
+      "https://assets.audiomack.com/al-afasy/5008d01a721b2382767130df7732ed70aafa2600138855aa1071731cf3a0e84c.jpeg?width=240&height=240&max=true",
   },
   {
     key: Math.random(),
-    studentName: `Mathemathics`,
+    studentName: `Mishari Rashid`,
     studentId: "ELEM32023",
     grade: "Grade 3",
     section: "A",
@@ -96,11 +103,12 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage:
+      "https://scontent.fadd1-1.fna.fbcdn.net/v/t39.30808-6/277759480_517508559945240_2716516652627364052_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=174925&_nc_ohc=-6zoqapMHroAX9idRJD&_nc_ht=scontent.fadd1-1.fna&oh=00_AfBoIRLh6kks3FAnonVmUPGgDyHodC_-dqa3S2JpN-7diQ&oe=63E32851",
   },
   {
     key: Math.random(),
-    studentName: `English`,
+    studentName: `Solomon David`,
     studentId: "ELEM32023",
     grade: "Grade 3",
     section: "A",
@@ -108,11 +116,12 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage:
+      "https://media.licdn.com/dms/image/C4E03AQGQazFu7td4Jw/profile-displayphoto-shrink_400_400/0/1601898761596?e=1680739200&v=beta&t=z1sIytfHwp1DVLw0WgP5DziH3zWPcLa7g7IlNuq0NGA",
   },
   {
     key: Math.random(),
-    studentName: `Chemistry`,
+    studentName: `Stem Hash`,
     studentId: "ELEM32023",
     grade: "Grade 7",
     section: "A",
@@ -120,11 +129,12 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage:
+      "https://townsquare.media/site/812/files/2021/05/j-cole.jpg?w=980&q=75",
   },
   {
     key: Math.random(),
-    studentName: `Biology`,
+    studentName: `Carol Gedion`,
     studentId: "ELEM32023",
     grade: "Grade 7",
     section: "A",
@@ -132,11 +142,11 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage: "https://i.mdel.net/i/db/2022/10/1802684/1802684-500w.jpg",
   },
   {
     key: Math.random(),
-    studentName: `Mathemathics`,
+    studentName: `Nicki Baltmore`,
     studentId: "ELEM32023",
     grade: "Grade 2",
     section: "A",
@@ -144,23 +154,12 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage:
+      "https://photos.psychologytoday.com/6f3c2e5c-deeb-4e31-ad7a-47d4df3a2c2e/2/320x400.jpeg",
   },
   {
     key: Math.random(),
-    studentName: `English`,
-    studentId: "ELEM32023",
-    grade: "Grade 5",
-    section: "A",
-    dob: "22-04-2000",
-    parentName: "Mola Seyemu",
-    mobileNumber: "0923656550",
-    address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
-  },
-  {
-    key: Math.random(),
-    studentName: `Biology`,
+    studentName: `Khabib Nomagomedov`,
     studentId: "ELEM32023",
     grade: "Grade 7",
     section: "A",
@@ -168,11 +167,12 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage:
+      "https://cdn.images.express.co.uk/img/dynamic/167/590x/Khabib-Nurmagomedov-Conor-McGregor-1647370.webp?r=1659021075853",
   },
   {
     key: Math.random(),
-    studentName: `Chemistry`,
+    studentName: `Kamaru Usman`,
     studentId: "ELEM32023",
     grade: "Grade 8",
     section: "A",
@@ -180,7 +180,8 @@ const originData = [
     parentName: "Mola Seyemu",
     mobileNumber: "0923656550",
     address: "Addis Ababa, Yeka, Megenagna",
-    teacher: `Not Assigned`,
+    studentImage:
+      "https://ichef.bbci.co.uk/news/800/cpsprodpb/F07C/production/_116946516_af324088-7b4f-424e-b35e-e95ebe5d1c9d.jpg",
   },
 ];
 
@@ -234,6 +235,7 @@ const StudentsList = () => {
   const [loading, setLoading] = useState(false);
   const [xScroll, setXScroll] = useState("fixed");
   const [editingKey, setEditingKey] = useState("");
+  const [tableData, setTableData] = useState(originData);
   const isEditing = (record) => record.key === editingKey;
   const onSelectChange = (newSelectedRowKeys) => {
     console.log("selectedRowKeys changed: ", newSelectedRowKeys);
@@ -250,6 +252,35 @@ const StudentsList = () => {
     });
     setEditingKey(record.key);
   };
+  //Save Edit Record
+  const save = async (key) => {
+    try {
+      const row = await form.validateFields();
+      const newData = [...originData];
+      const index = newData.findIndex((item) => key === item.key);
+      if (index > -1) {
+        const item = newData[index];
+        newData.splice(index, 1, {
+          ...item,
+          ...row,
+        });
+        setTableData(newData);
+        setEditingKey("");
+      } else {
+        newData.push(row);
+        setTableData(newData);
+        setEditingKey("");
+      }
+    } catch (errInfo) {
+      console.log("Validate Failed:", errInfo);
+    }
+  };
+  //delete Student
+  const deleteStudent = (record) => {
+    const indexValue = tableData.indexOf(record);
+    tableData.splice(indexValue, 1);
+    setTableData([...tableData]);
+  };
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
@@ -263,7 +294,6 @@ const StudentsList = () => {
       setLoading(false);
     }, 1000);
   };
-
   //columns
   const columns = [
     {
@@ -272,6 +302,21 @@ const StudentsList = () => {
       width: 250,
       editable: true,
       Assignable: true,
+      render: (_, record) => {
+        // console.log(record);
+        return (
+          <div>
+            <Image
+              style={{ borderRadius: 5 }}
+              alt="hello"
+              width={40}
+              height={40}
+              src={record.studentImage}
+            />
+            <span style={{ marginLeft: 10 }}>{record.studentName}</span>
+          </div>
+        );
+      },
     },
     {
       title: "Student ID",
@@ -338,7 +383,7 @@ const StudentsList = () => {
         return editable ? (
           <span>
             <Typography.Link
-              // onClick={() => save(record.key)}
+              onClick={() => save(record.key)}
               style={{
                 marginRight: 8,
               }}>
@@ -358,7 +403,7 @@ const StudentsList = () => {
             <Popconfirm
               title="Sure want to delete?"
               onConfirm={() => {
-                // deleteCourse(record);
+                deleteStudent(record);
               }}>
               <a>Delete</a>
             </Popconfirm>
@@ -407,7 +452,12 @@ const StudentsList = () => {
         <div class="StudentListTitle">
           <Title
             level={3}
-            style={{ textAlign: "left", marginTop: 0, marginBottom: 10 }}>
+            style={{
+              marginLeft: 5,
+              textAlign: "left",
+              marginTop: 5,
+              marginBottom: 10,
+            }}>
             Students List
           </Title>
         </div>
@@ -416,11 +466,16 @@ const StudentsList = () => {
             style={{
               display: "flex",
               textAlign: "left",
-              marginBottom: 10,
-              marginTop: 0,
+              marginBottom: 5,
+              marginTop: 8,
             }}>
             <Search
-              style={{ marginLeft: "30%" }}
+              style={{
+                border: "1px solid blue",
+                borderRadius: 8,
+                marginLeft: "30%",
+                marginRight: 5,
+              }}
               placeholder="input search text"
               // onSearch={onSearch}
               // onChange={onSearchChange}
@@ -436,7 +491,7 @@ const StudentsList = () => {
               display: "flex",
               textAlign: "left",
               marginBottom: 5,
-              marginTop: 19,
+              marginTop: 5,
             }}>
             <Button
               type="primary"
@@ -448,6 +503,7 @@ const StudentsList = () => {
             <span
               style={{
                 marginLeft: 8,
+                marginTop: 6,
               }}>
               {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
             </span>
@@ -463,8 +519,9 @@ const StudentsList = () => {
                   cell: EditableCell,
                 },
               }}
+              bordered={false}
               rowSelection={rowSelection}
-              dataSource={originData}
+              dataSource={tableData}
               columns={mergedColumns}
               rowClassName="editable-row"
               pagination={true}
