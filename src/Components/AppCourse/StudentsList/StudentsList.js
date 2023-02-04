@@ -12,6 +12,7 @@ import {
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./StudentsList.css";
 const { Option } = Select;
 const originData = [
@@ -230,6 +231,7 @@ const EditableCell = ({
   );
 };
 const StudentsList = () => {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -299,7 +301,7 @@ const StudentsList = () => {
     {
       title: "Student Name",
       dataIndex: "studentName",
-      width: 250,
+      width: 200,
       editable: true,
       Assignable: true,
       render: (_, record) => {
@@ -484,14 +486,32 @@ const StudentsList = () => {
             />
           </div>
         </div>
-        <div class="ActionsTab">Hello</div>
+        <div class="ActionsTab">
+          <div
+            style={{
+              display: "flex-end",
+              textAlign: "right",
+              marginBottom: 5,
+              marginTop: 20,
+              marginRight: 5,
+            }}>
+            <Button
+              onClick={() => {
+                navigate("/studentAdmission");
+              }}
+              type="primary"
+              style={{ marginLeft: 5 }}>
+              Assign Teacher
+            </Button>
+          </div>
+        </div>
         <div class="ReloadAndSelectCount">
           <div
             style={{
               display: "flex",
               textAlign: "left",
               marginBottom: 5,
-              marginTop: 5,
+              marginTop: 20,
             }}>
             <Button
               type="primary"

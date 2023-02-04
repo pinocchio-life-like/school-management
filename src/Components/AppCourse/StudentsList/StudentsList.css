@@ -23,12 +23,10 @@
 }
 
 .ActionsTab {
-    border: 1px solid salmon;
     grid-area: ActionsTab;
 }
 
 .ReloadAndSelectCount {
-    border: 1px solid salmon;
     grid-area: ReloadAndSelectCount;
 }
 
