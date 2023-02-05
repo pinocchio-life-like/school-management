@@ -68,7 +68,14 @@ const StudentAdmission = () => {
       <Form noStyle onFinish={onFinish}>
         <div class="StudentAddmissionContainer">
           <div class="StudentAddmissionTitle">
-            <Title level={3} style={{ textAlign: "left", marginTop: 0 }}>
+            <Title
+              level={3}
+              style={{
+                textAlign: "left",
+                marginTop: 0,
+                paddingTop: 8,
+                marginLeft: 5,
+              }}>
               Student Admission
             </Title>
           </div>
@@ -103,7 +110,7 @@ const StudentAdmission = () => {
                   />
                 </Modal>
               </div>
-              <div class="SiblingInfo" style={{ marginTop: 21.37 }}>
+              <div class="SiblingInfo" style={{ marginTop: 9 }}>
                 <Collapse
                   //   style={{ marginBottom: -30 }}
                   expandIcon={({ isActive }) => (
@@ -119,7 +126,11 @@ const StudentAdmission = () => {
                     header="Add Sibling"
                     key="1">
                     <Col style={{ width: "100%" }}>
-                      <div style={{ textAlign: "left", margin: -2.55 }}>
+                      <div
+                        style={{
+                          textAlign: "left",
+                          margin: 0,
+                        }}>
                         Class
                       </div>
                       <Row>
@@ -287,7 +298,9 @@ const StudentAdmission = () => {
             </div>
             <div class="ParentDetail">
               <div class="ParentDetailName">
-                <Title level={4} style={{ textAlign: "left", marginTop: 0 }}>
+                <Title
+                  level={4}
+                  style={{ textAlign: "left", marginTop: 0, marginLeft: 15 }}>
                   Parent Guardian information
                 </Title>
               </div>

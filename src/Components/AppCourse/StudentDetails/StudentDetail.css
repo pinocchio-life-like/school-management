@@ -11,40 +11,67 @@
 }
 
 .StudentDetailTitle {
-    border: 1px solid salmon;
     grid-area: StudentListTitle;
 }
 
 .TabsAndDetail {
-    border: 1px solid salmon;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 0.1fr 2.3fr 1fr;
     gap: 0px 0px;
     grid-auto-flow: row;
     grid-template-areas:
-        "AvailableTabs AvailableTabs AvailableTabs"
         "TabDetail TabDetail TabDetail"
         "TabDetail TabDetail TabDetail";
     grid-area: TabsAndDetail;
 }
 
-.AvailableTabs {
-    border: 1px solid salmon;
-    grid-area: AvailableTabs;
-}
-
 .TabDetail {
-    border: 1px solid salmon;
     grid-area: TabDetail;
 }
 
 .ProfilePhoto {
-    border: 1px solid salmon;
+    box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 3px;
+    margin-left: 13px;
+    width: 200px;
     grid-area: ProfilePhoto;
 }
 
+.ProfilePhoto::before {
+    content: '';
+    margin-top: 40px;
+    position: absolute;
+    margin-left: -10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 160px;
+    background-color: rgb(36, 123, 126);
+}
+
 .RoughDetail {
-    border: 1px solid salmon;
+    box-shadow: rgba(36, 123, 126, 0.585) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+    margin-left: -66px;
     grid-area: RoughDetail;
+}
+
+.UpperEmptyDiv {
+    height: 20%;
+
+}
+
+.LowerDetailDiv {
+    text-align: left;
+    align-items: center;
+    display: flex;
+    background-color: rgb(36, 123, 126);
+    height: 80%;
+    border: 1px solid rgb(78, 152, 182);
+    border-top-left-radius: 20px;
+}
+
+.RoughtDetailsCss {
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
