@@ -39,16 +39,15 @@
 
 .ProfilePhoto::before {
     content: '';
-    margin-top: 40px;
     position: absolute;
     margin-left: -30px;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 30px;
-    height: 160px;
+    height: 200px;
     background-color: rgb(36, 123, 126);
-    border-top-right-radius: 15px;
+    /* border-top-right-radius: 15px; */
 }
 
 .RoughDetail {
