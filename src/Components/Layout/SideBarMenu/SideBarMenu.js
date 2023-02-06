@@ -32,6 +32,7 @@ const items = [
   ]),
   getItem("Fees Collection", "sub4", <TeamOutlined />, [
     getItem("Fees Group", "/feesGroup"),
+    getItem("Collect Fees", "/collectFees"),
   ]),
 ];
 const SideBarMenu = () => {
