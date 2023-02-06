@@ -66,8 +66,8 @@ const StudentAdmission = () => {
   return (
     <div>
       <Form noStyle onFinish={onFinish}>
-        <div class="StudentAddmissionContainer">
-          <div class="StudentAddmissionTitle">
+        <div className="StudentAddmissionContainer">
+          <div className="StudentAddmissionTitle">
             <Title
               level={3}
               style={{
@@ -80,8 +80,8 @@ const StudentAdmission = () => {
             </Title>
           </div>
           <>
-            <div class="PhotoAndSibling">
-              <div class="AddPhoto">
+            <div className="PhotoAndSibling">
+              <div className="AddPhoto">
                 <div className="setSizeClassName">
                   <div className="setUploadSize">
                     <ImgCrop rotate>
@@ -110,7 +110,7 @@ const StudentAdmission = () => {
                   />
                 </Modal>
               </div>
-              <div class="SiblingInfo" style={{ marginTop: 9 }}>
+              <div className="SiblingInfo" style={{ marginTop: 9 }}>
                 <Collapse
                   //   style={{ marginBottom: -30 }}
                   expandIcon={({ isActive }) => (
@@ -178,7 +178,7 @@ const StudentAdmission = () => {
                 </Collapse>
               </div>
             </div>
-            <div class="StudentAddForm">
+            <div className="StudentAddForm">
               <>
                 <Row style={{ marginTop: "10px" }}>
                   <Col style={{ width: "30.5%", marginLeft: "15px" }}>
@@ -296,15 +296,15 @@ const StudentAdmission = () => {
                 </Row>
               </>
             </div>
-            <div class="ParentDetail">
-              <div class="ParentDetailName">
+            <div className="ParentDetail">
+              <div className="ParentDetailName">
                 <Title
                   level={4}
                   style={{ textAlign: "left", marginTop: 0, marginLeft: 15 }}>
                   Parent Guardian information
                 </Title>
               </div>
-              <div class="ParentDetailForm">
+              <div className="ParentDetailForm">
                 <Row style={{ marginTop: "0px" }}>
                   <Col style={{ width: "30.5%", marginLeft: "15px" }}>
                     <div style={{ textAlign: "left" }}>First Name</div>

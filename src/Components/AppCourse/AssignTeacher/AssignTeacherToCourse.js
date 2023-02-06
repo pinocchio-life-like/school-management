@@ -405,7 +405,7 @@ const AssignTeacherToCourse = () => {
                     {gradeDefaultValue}
 
                     {gradeRender}
-                    <div class="CourseSaveButton">
+                    <div className="CourseSaveButton">
                       <Form.Item shouldUpdate>
                         {() => (
                           <Button
@@ -478,14 +478,14 @@ const AssignTeacherToCourse = () => {
 
   return (
     <>
-      <div class={containerCss}>
-        <div class="AssignTeacherTitle">
+      <div className={containerCss}>
+        <div className="AssignTeacherTitle">
           <Title level={3} style={{ textAlign: "left", marginBottom: 10 }}>
             Teachers List
           </Title>
         </div>
-        <div class="CourseListTitleAndSearchBar">
-          <div class="CourseGroupSearchBar">
+        <div className="CourseListTitleAndSearchBar">
+          <div className="CourseGroupSearchBar">
             <div
               style={{
                 display: "flex",
@@ -506,8 +506,8 @@ const AssignTeacherToCourse = () => {
         </div>
         {editing ? (
           <>
-            <div class="AssignTeacherForm">{sectionsForEachGrade}</div>
-            <div class="OnAssignTeacherTable">
+            <div className="AssignTeacherForm">{sectionsForEachGrade}</div>
+            <div className="OnAssignTeacherTable">
               <Table
                 //   bordered
                 dataSource={tableData}
@@ -521,7 +521,7 @@ const AssignTeacherToCourse = () => {
           </>
         ) : (
           <>
-            <div class="FullTableCss">
+            <div className="FullTableCss">
               <Form form={form} component={false}>
                 <Table
                   //   bordered

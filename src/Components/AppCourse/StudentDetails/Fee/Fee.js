@@ -122,10 +122,10 @@ const Fee = () => {
       <Table
         columns={columns}
         dataSource={data}
-        // scroll={{
-        //   y: 300,
-        //   // x: '100vw',
-        // }}
+        scroll={{
+          y: 500,
+          // x: '100vw',
+        }}
         pagination
       />
     </div>

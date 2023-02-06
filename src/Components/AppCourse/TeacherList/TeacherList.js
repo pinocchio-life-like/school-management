@@ -431,10 +431,10 @@ const TeacherList = () => {
     if (e.target.value.length === 0) setFilteredData(originData);
   };
   return (
-    <div class="CourseListCSS">
+    <div className="CourseListCSS">
       {contextHolder}
-      <div class="CourseAddContainer">
-        <div class="CourseAddTitle">
+      <div className="CourseAddContainer">
+        <div className="CourseAddTitle">
           <Title level={3} style={{ textAlign: "left", marginBottom: 10 }}>
             Add Teacher
           </Title>
@@ -515,7 +515,7 @@ const TeacherList = () => {
             </div>
           </Form.Item>
 
-          <div class="coursesIdaveButton">
+          <div className="coursesIdaveButton">
             <Form.Item shouldUpdate>
               {() => (
                 <Button
@@ -529,8 +529,8 @@ const TeacherList = () => {
           </div>
         </Form>
       </div>
-      <div class="CourseListContainer">
-        <div class="CourseListTitle">
+      <div className="CourseListContainer">
+        <div className="CourseListTitle">
           <Title level={3} style={{ textAlign: "left", marginBottom: 10 }}>
             Teacher List
           </Title>
@@ -559,7 +559,7 @@ const TeacherList = () => {
             </Button>
           </div>
         </div>
-        <div class="CourseListTable">
+        <div className="CourseListTable">
           <div>
             <Form form={form} component={false}>
               <Table

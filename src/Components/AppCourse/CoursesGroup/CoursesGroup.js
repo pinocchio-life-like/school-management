@@ -13,14 +13,18 @@ import {
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
 import React, { useState } from "react";
-import "./CourseGroup.css";
+import "./CoursesGroup.css";
 
 //original Data
 const originData = [
   {
     key: Math.random(),
     courseName: `Grade 1 Courses Group`,
-    notOffered: "All Offered",
+    notOffered: (
+      <div>
+        <div>All Offered</div>
+      </div>
+    ),
     courses: (
       <div>
         <div>Mathemathics</div>
@@ -67,7 +71,7 @@ const originData = [
     ),
   },
 ];
-const CourseGroup = () => {
+const CoursesGroup = () => {
   const location = useLocation();
   const [form] = Form.useForm();
   const [addForm] = Form.useForm();
@@ -75,37 +79,17 @@ const CourseGroup = () => {
   const [recordBeingEdited, setRecordBeingEdited] = useState("");
   const [offeredCourses, setOfferedCourses] = useState([]);
   const [containerCss, setContainerCss] = useState("CourseGroupCSS");
-  let importedData, courses, notOffered;
+  let courses, notOffered;
 
-  if (location.state.courseGroup !== undefined) {
-    importedData = location.state.courseGroup;
-    courses = importedData.courses.map((course) => {
-      return <div>{course}</div>;
-    });
-    notOffered = importedData.notOffered.map((course) => {
-      return <div>{course}</div>;
-    });
-  }
-  //   console.log(courses);
-  const [tableData, setTableData] = useState(() => {
-    if (location.state.courseGroup) {
-      return [
-        {
-          key: Math.random(),
-          courseName: `${location.state.courseGroup.courseGroupName}`,
-          notOffered: <div>{notOffered}</div>,
-          courses: <div>{courses}</div>,
-        },
-        ...originData,
-      ];
-    }
-    return [...originData];
+  courses = originData.map((course) => {
+    return <div>{course.courses}</div>;
   });
-  //   if (location.state.courseGroup) {
-  //     setTableData(location.state.courseGroup);
-  //   }
-  //   console.log(location.state.courseGroup);
-  //On finish adding course Group
+  notOffered = originData.map((course) => {
+    return <div>{course.notOffered}</div>;
+  });
+
+  //   console.log(courses);
+  const [tableData, setTableData] = useState([...originData]);
   const onFinish = (values) => {
     console.log(recordBeingEdited.courses);
     const indexValue = tableData.indexOf(recordBeingEdited);
@@ -387,4 +371,4 @@ const CourseGroup = () => {
   );
 };
 
-export default CourseGroup;
+export default CoursesGroup;

@@ -15,6 +15,7 @@ const items = [
   getItem("Student", "sub1", <TeamOutlined />, [
     getItem("Student Admission", "/studentAdmission"),
     getItem("Students List", "/studentsList"),
+    getItem("Students Detail", "/studentDetail"),
   ]),
   getItem("Teacher", "sub2", <TeamOutlined />, [
     getItem("Assign Teacher", "/assignTeacher"),
@@ -26,7 +27,11 @@ const items = [
     // getItem("Edit Course", "/editCourse"),
     getItem("Course Break Down", "/courseBreakDown"),
     getItem("Course Offer", "/courseOffer"),
+    getItem("Courses Group", "/coursesGroup"),
     // getItem("Course Group", "/courseGroup"),
+  ]),
+  getItem("Fees Collection", "sub4", <TeamOutlined />, [
+    getItem("Fees Group", "/feesGroup"),
   ]),
 ];
 const SideBarMenu = () => {

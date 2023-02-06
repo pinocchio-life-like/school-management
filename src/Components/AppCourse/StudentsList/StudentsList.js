@@ -12,13 +12,13 @@ import {
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./StudentsList.css";
 const { Option } = Select;
 const originData = [
   {
     key: Math.random(),
-    studentName: `John Wick`,
+    studentName: <Link to="/studentDetail">John Wick</Link>,
     studentId: "ELEM32023",
     grade: "Grade 1",
     section: "A",
@@ -31,7 +31,7 @@ const originData = [
   },
   {
     key: Math.random(),
-    studentName: `Nairobi Shoan`,
+    studentName: <Link to="/studentDetail">Nairobi Shoan</Link>,
     studentId: "ELEM32023",
     grade: "Grade 1",
     section: "A",
@@ -44,7 +44,7 @@ const originData = [
   },
   {
     key: Math.random(),
-    studentName: `Adams Kent`,
+    studentName: <Link to="/studentDetail">Adams Kent</Link>,
     studentId: "ELEM32023",
     grade: "Grade 1",
     section: "A",
@@ -57,7 +57,7 @@ const originData = [
   },
   {
     key: Math.random(),
-    studentName: `Bohr Castle`,
+    studentName: <Link to="/studentDetail">Bohr Castle</Link>,
     studentId: "ELEM32023",
     grade: "Grade 1",
     section: "A",
@@ -70,7 +70,7 @@ const originData = [
   },
   {
     key: Math.random(),
-    studentName: `Islam Sobhi`,
+    studentName: <Link to="/studentDetail">Islam Sobhi</Link>,
     studentId: "ELEM32023",
     grade: "Grade 2",
     section: "A",
@@ -83,7 +83,7 @@ const originData = [
   },
   {
     key: Math.random(),
-    studentName: `Omar Hisham`,
+    studentName: <Link to="/studentDetail">Omar Hisham</Link>,
     studentId: "ELEM32023",
     grade: "Grade 2",
     section: "A",
@@ -96,7 +96,7 @@ const originData = [
   },
   {
     key: Math.random(),
-    studentName: `Mishari Rashid`,
+    studentName: <Link to="/studentDetail">Mishari Rashid</Link>,
     studentId: "ELEM32023",
     grade: "Grade 3",
     section: "A",
@@ -109,7 +109,7 @@ const originData = [
   },
   {
     key: Math.random(),
-    studentName: `Solomon David`,
+    studentName: <Link to="/studentDetail">Solomon David</Link>,
     studentId: "ELEM32023",
     grade: "Grade 3",
     section: "A",
@@ -122,7 +122,7 @@ const originData = [
   },
   {
     key: Math.random(),
-    studentName: `Stem Hash`,
+    studentName: <Link to="/studentDetail">Stem Hash</Link>,
     studentId: "ELEM32023",
     grade: "Grade 7",
     section: "A",
@@ -135,7 +135,7 @@ const originData = [
   },
   {
     key: Math.random(),
-    studentName: `Carol Gedion`,
+    studentName: <Link to="/studentDetail">Carol Gedion</Link>,
     studentId: "ELEM32023",
     grade: "Grade 7",
     section: "A",
@@ -258,7 +258,7 @@ const StudentsList = () => {
   const save = async (key) => {
     try {
       const row = await form.validateFields();
-      const newData = [...originData];
+      const newData = [...tableData];
       const index = newData.findIndex((item) => key === item.key);
       if (index > -1) {
         const item = newData[index];
@@ -450,8 +450,8 @@ const StudentsList = () => {
   };
   return (
     <div>
-      <div class="StudentsListConatiner">
-        <div class="StudentListTitle">
+      <div className="StudentsListConatiner">
+        <div className="StudentListTitle">
           <Title
             level={3}
             style={{
@@ -463,7 +463,7 @@ const StudentsList = () => {
             Students List
           </Title>
         </div>
-        <div class="StudentListSearch">
+        <div className="StudentListSearch">
           <div
             style={{
               display: "flex",
@@ -486,7 +486,7 @@ const StudentsList = () => {
             />
           </div>
         </div>
-        <div class="ActionsTab">
+        <div className="ActionsTab">
           <div
             style={{
               display: "flex-end",
@@ -505,7 +505,7 @@ const StudentsList = () => {
             </Button>
           </div>
         </div>
-        <div class="ReloadAndSelectCount">
+        <div className="ReloadAndSelectCount">
           <div
             style={{
               display: "flex",
@@ -529,7 +529,7 @@ const StudentsList = () => {
             </span>
           </div>
         </div>
-        <div class="StudentListTableContainer">
+        <div className="StudentListTableContainer">
           <Form form={form} component={false}>
             <Table
               style={{ zIndex: -100 }}

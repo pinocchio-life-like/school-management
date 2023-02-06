@@ -17,7 +17,7 @@
 .TabsAndDetail {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 0.1fr 2.3fr 1fr;
+    grid-template-rows: 0.1fr 2.3fr 0fr;
     gap: 0px 0px;
     grid-auto-flow: row;
     grid-template-areas:
@@ -32,7 +32,7 @@
 
 .ProfilePhoto {
     box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 3px;
-    margin-left: 13px;
+    margin-left: 40px;
     width: 200px;
     grid-area: ProfilePhoto;
 }
@@ -41,13 +41,14 @@
     content: '';
     margin-top: 40px;
     position: absolute;
-    margin-left: -10px;
+    margin-left: -30px;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 20px;
+    width: 30px;
     height: 160px;
     background-color: rgb(36, 123, 126);
+    border-top-right-radius: 15px;
 }
 
 .RoughDetail {
@@ -62,6 +63,8 @@
 }
 
 .LowerDetailDiv {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    margin-left: 27px;
     text-align: left;
     align-items: center;
     display: flex;
@@ -74,4 +77,14 @@
 .RoughtDetailsCss {
     box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.PersonalDetailsPTag p {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin-top: -15px;
+    margin-left: 40px;
+}
+
+.PersonalDetailsPTag h3 {
+    margin-left: 25px;
 }

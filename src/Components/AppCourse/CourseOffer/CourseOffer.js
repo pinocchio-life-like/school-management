@@ -235,20 +235,20 @@ const CourseOffer = () => {
   };
   const hasSelected = selectedRowKeys.length > 0;
   return (
-    <div class="CourseOfferCSS">
-      <div class="OfferCourseTitle">
+    <div className="CourseOfferCSS">
+      <div className="OfferCourseTitle">
         <Title level={3} style={{ textAlign: "left" }}>
           Offer Courses
         </Title>
       </div>
-      <div class="OfferTableName">
-        <div class="OfferCourseTitle">
+      <div className="OfferTableName">
+        <div className="OfferCourseTitle">
           <Title level={3} style={{ textAlign: "left" }}>
             Courses List
           </Title>
         </div>
       </div>
-      <div class="GradeSearchBar">
+      <div className="GradeSearchBar">
         <div
           style={{
             display: "flex",
@@ -302,7 +302,7 @@ const CourseOffer = () => {
           />
         </div>
       </div>
-      <div class="CourseOfferForm">
+      <div className="CourseOfferForm">
         <Form
           className="CourseGroupList"
           style={{ justifyContent: "left", marginTop: 17 }}
@@ -381,7 +381,7 @@ const CourseOffer = () => {
               <Col>{selectedToOffer}</Col>
             </Checkbox.Group>
           </Form.Item>
-          <div class="CourseSaveButton">
+          <div className="CourseSaveButton">
             <Form.Item shouldUpdate>
               {() => (
                 <Button
@@ -395,7 +395,7 @@ const CourseOffer = () => {
           </div>
         </Form>
       </div>
-      <div class="CourseOfferTable">
+      <div className="CourseOfferTable">
         <div
           style={{
             display: "flex",

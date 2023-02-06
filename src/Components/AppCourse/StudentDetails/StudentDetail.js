@@ -1,16 +1,21 @@
-import { Image, List, Tabs } from "antd";
-import { AndroidOutlined, AppleOutlined } from "@ant-design/icons";
+import { Divider, Image, List, Tabs } from "antd";
+import {
+  MailOutlined,
+  AndroidOutlined,
+  AppleOutlined,
+} from "@ant-design/icons";
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
 import React from "react";
 import "./StudentDetail.css";
 import Fee from "./Fee/Fee";
+import DetailTable from "./DetailTable/DetailTable";
 const StudentDetail = () => {
   return (
     <div>
       <div>
-        <div class="StudentDetailContainerCss">
-          <div class="StudentDetailTitle" style={{ display: "flex" }}>
+        <div className="StudentDetailContainerCss">
+          <div className="StudentDetailTitle" style={{ display: "flex" }}>
             <Title level={3} style={{ textAlign: "left", marginTop: 0 }}>
               Student Detail
             </Title>
@@ -34,7 +39,7 @@ const StudentDetail = () => {
               />
             </div>
           </div>
-          <div class="ProfilePhoto">
+          <div className="ProfilePhoto">
             <Image
               preview={false}
               width={200}
@@ -42,7 +47,7 @@ const StudentDetail = () => {
               src="https://s3.amazonaws.com/media.thecrimson.com/photos/2014/11/07/202918_1301040.jpg"
             />
           </div>
-          <div class="RoughDetail">
+          <div className="RoughDetail">
             <div className="UpperEmptyDiv"></div>
             <div className="LowerDetailDiv">
               <div
@@ -107,21 +112,83 @@ const StudentDetail = () => {
               </div>
             </div>
           </div>
-          <div class="TabsAndDetail">
-            <div class="TabDetail">
+          <div className="TabsAndDetail">
+            <div className="TabDetail">
               <Tabs
                 style={{ marginTop: 10, marginLeft: "10px" }}
                 defaultActiveKey="1">
                 <Tabs.TabPane tab="Profile" key="1">
                   <div style={{ display: "flex" }}>
-                    <div style={{ width: "40%", border: "1px solid black" }}>
-                      <Title
-                        level={4}
-                        style={{ textAlign: "left", marginTop: 0 }}>
-                        Personal Details
-                      </Title>
+                    <div
+                      style={{
+                        boxShadow:
+                          "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px",
+                        textAlign: "left",
+                        width: "25%",
+                        borderRadius: 10,
+                      }}>
+                      <div
+                        className="PersonalDetailsPTag"
+                        style={{ marginLeft: 5 }}>
+                        <Divider orientation="left">
+                          <Title level={4} style={{ marginTop: 15 }}>
+                            Personal Details:
+                          </Title>
+                        </Divider>
+                        <div>
+                          <h3>
+                            <AppleOutlined />
+                            Name
+                          </h3>
+                          <p>John Wick</p>
+                        </div>
+                        <div>
+                          <h3>
+                            <AppleOutlined />
+                            Class
+                          </h3>
+                          <p>Grade 8 A</p>
+                        </div>
+                        <div>
+                          <h3>
+                            <AppleOutlined />
+                            Gender
+                          </h3>
+                          <p>Male</p>
+                        </div>
+                        <div>
+                          <h3>
+                            <MailOutlined />
+                            Email
+                          </h3>
+                          <p>icbr19fl@gmail.com</p>
+                        </div>
+                        <div>
+                          <h3>
+                            <AppleOutlined />
+                            Date of birth
+                          </h3>
+                          <p>22 Apr 1991</p>
+                        </div>
+                        <div>
+                          <h3>
+                            <AppleOutlined />
+                            Admission Number
+                          </h3>
+                          <p>HIGH034611</p>
+                        </div>
+                        <div>
+                          <h3>
+                            <AppleOutlined />
+                            Religion
+                          </h3>
+                          <p>Uknown</p>
+                        </div>
+                      </div>
                     </div>
-                    <div>hello 2</div>
+                    <div style={{ marginLeft: 15, width: "74%" }}>
+                      <DetailTable />
+                    </div>
                   </div>
                 </Tabs.TabPane>
                 <Tabs.TabPane tab="Fee" key="2">

@@ -336,10 +336,10 @@ const CourseBreakDown = () => {
     if (e.target.value.length === 0) setFilteredData(originData);
   };
   return (
-    <div class="CourseListCSS">
+    <div className="CourseListCSS">
       {contextHolder}
-      <div class="CourseAddContainer">
-        <div class="CourseAddTitle">
+      <div className="CourseAddContainer">
+        <div className="CourseAddTitle">
           <Title level={3} style={{ textAlign: "left", marginBottom: 10 }}>
             Add Course
           </Title>
@@ -417,7 +417,7 @@ const CourseBreakDown = () => {
             </div>
           </Form.Item>
 
-          <div class="CourseSaveButton">
+          <div className="CourseSaveButton">
             <Form.Item shouldUpdate>
               {() => (
                 <Button
@@ -431,8 +431,8 @@ const CourseBreakDown = () => {
           </div>
         </Form>
       </div>
-      <div class="CourseListContainer">
-        <div class="CourseListTitle">
+      <div className="CourseListContainer">
+        <div className="CourseListTitle">
           <Title level={3} style={{ textAlign: "left", marginBottom: 10 }}>
             Course List
           </Title>
@@ -461,7 +461,7 @@ const CourseBreakDown = () => {
             </Button>
           </div>
         </div>
-        <div class="CourseListTable">
+        <div className="CourseListTable">
           <div>
             <Form form={form} component={false}>
               <Table

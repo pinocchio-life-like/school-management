@@ -12,6 +12,8 @@ import TeacherList from "../AppCourse/TeacherList/TeacherList";
 import StudentAdmission from "../AppCourse/StudentAdmission/StudentAdmission";
 import StudentDetail from "../AppCourse/StudentDetails/StudentDetail";
 import StudentsList from "../AppCourse/StudentsList/StudentsList";
+import CoursesGroup from "../AppCourse/CoursesGroup/CoursesGroup";
+import FeesGroup from "../AppCourse/FeesCollection/FeesGroup/FeesGroup";
 
 const AppRoute = () => {
   return (
@@ -29,6 +31,8 @@ const AppRoute = () => {
         <Route path="/studentAdmission" element={<StudentAdmission />} />
         <Route path="/studentDetail" element={<StudentDetail />} />
         <Route path="/studentsList" element={<StudentsList />} />
+        <Route path="/coursesGroup" element={<CoursesGroup />} />
+        <Route path="/feesGroup" element={<FeesGroup />} />
       </Routes>
     </div>
   );
