@@ -33,6 +33,7 @@ const originData = [
         <p>PhysG8</p>
       </>
     ),
+    competitionalLevel: "Level 7-8",
     status: `Not Assigned`,
   },
   {
@@ -49,6 +50,7 @@ const originData = [
         <p>PhysG8</p>
       </>
     ),
+    competitionalLevel: "Level 7-8",
     status: `Not Assigned`,
   },
   {
@@ -65,6 +67,7 @@ const originData = [
         <p>PhysG8</p>
       </>
     ),
+    competitionalLevel: "Level 7-8",
     status: `Not Assigned`,
   },
   {
@@ -81,6 +84,7 @@ const originData = [
         <p>PhysG8</p>
       </>
     ),
+    competitionalLevel: "Level 7-8",
     status: `Not Assigned`,
   },
   {
@@ -97,6 +101,7 @@ const originData = [
         <p>PhysG8</p>
       </>
     ),
+    competitionalLevel: "Level 7-8",
     status: `Not Assigned`,
   },
   {
@@ -113,6 +118,7 @@ const originData = [
         <p>PhysG8</p>
       </>
     ),
+    competitionalLevel: "Level 7-8",
     status: `Not Assigned`,
   },
 ];
@@ -175,6 +181,7 @@ const TeacherList = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [filteredData, setFilteredData] = useState(originData);
   const [coursesForGradeRender, setCoursesForGradeRender] = useState([]);
+  const [onLevelRender, setOnLevelRender] = useState([]);
 
   // edit start start
   const edit = (record) => {
@@ -256,9 +263,16 @@ const TeacherList = () => {
       Assignable: true,
     },
     {
+      title: "Competitional Level",
+      dataIndex: "competitionalLevel",
+      width: "20%",
+      editable: true,
+      Assignable: true,
+    },
+    {
       title: "Status",
       dataIndex: "status",
-      width: "25%",
+      width: "18%",
       editable: true,
       Assignable: true,
     },
@@ -344,6 +358,7 @@ const TeacherList = () => {
       teacherName: `${values.teacherName}`,
       grade: grades,
       coursesId: coursesId,
+      competitionalLevel: values.competitionalLevel,
       status: `Not Assigned`,
     });
     success();
@@ -384,6 +399,42 @@ const TeacherList = () => {
       );
     }
     setCoursesForGradeRender([...coursesForGrade]);
+  };
+  const onLevelSelectChange = (value) => {
+    const data = [];
+    if (value === "Level 1-4") {
+      setOnLevelRender(
+        <>
+          <Option value="Grade 1">Grade 1</Option>
+          <Option value="Grade 2">Grade 2</Option>
+          <Option value="Grade 3">Grade 3</Option>
+          <Option value="Grade 4">Grade 4</Option>
+        </>
+      );
+    } else if (value === "Level 5-8") {
+      setOnLevelRender(
+        <>
+          <Option value="Grade 5">Grade 5</Option>
+          <Option value="Grade 6">Grade 6</Option>
+          <Option value="Grade 7">Grade 7</Option>
+          <Option value="Grade 8">Grade 8</Option>
+        </>
+      );
+    } else if (value === "Level 9-10") {
+      setOnLevelRender(
+        <>
+          <Option value="Grade 9">Grade 9</Option>
+          <Option value="Grade 10">Grade 10</Option>
+        </>
+      );
+    } else if (value === "Level 11-12") {
+      setOnLevelRender(
+        <>
+          <Option value="Grade 11">Grade 11</Option>
+          <Option value="Grade 12">Grade 12</Option>
+        </>
+      );
+    }
   };
   const onteacherNameChange = (e) => {
     const teacherName = e.target.value;
@@ -463,6 +514,26 @@ const TeacherList = () => {
             />
           </Form.Item>
           <Form.Item
+            name="competitionalLevel"
+            label="Competitional Level"
+            style={{ minWidth: 250, textAlign: "left", marginTop: -20 }}
+            rules={[
+              {
+                required: true,
+                message: "Please input Teacher name!",
+              },
+            ]}>
+            <Select
+              style={{ marginTop: -25 }}
+              onChange={onLevelSelectChange}
+              placeholder="Select Grade">
+              <Option value="Level 1-4">Level 1-4</Option>
+              <Option value="Level 5-8">Level 5-8</Option>
+              <Option value="Level 9-10">Level 9-10</Option>
+              <Option value="Level 11-12">Level 11-12</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
             label="Grade"
             style={{ minWidth: 250, textAlign: "left", marginTop: -20 }}
             name="grade"
@@ -478,11 +549,7 @@ const TeacherList = () => {
               style={{ marginTop: -25 }}
               onChange={onGradeSelectChange}
               placeholder="Select Grade">
-              <Option value="Grade 1">Grade 1</Option>
-              <Option value="Grade 2">Grade 2</Option>
-              <Option value="Grade 3">Grade 3</Option>
-              <Option value="Grade 4">Grade 4</Option>
-              <Option value="Grade 5">Grade 5</Option>
+              {onLevelRender}
             </Select>
           </Form.Item>
           {coursesForGradeRender}
@@ -551,7 +618,7 @@ const TeacherList = () => {
             />
             <Button
               onClick={() => {
-                navigate("/courseOffer");
+                navigate("/assignTeacher");
               }}
               type="primary"
               style={{ marginLeft: 5 }}>

@@ -27,17 +27,17 @@
 .SiblingInfo {
     background-color: rgba(00, 15, 29, 0.1);
     margin-bottom: 25px;
-    margin-right: 18px;
+    margin-right: 28px;
     border-radius: 9px;
     grid-area: SiblingInfo;
 }
 
 .StudentAddmissionTitle {
-    background-color: rgba(0, 15, 29, 0.1);
-    border-top-left-radius: 9px;
-    border-top-right-radius: 9px;
+    background-color: rgba(69, 147, 255, 0.3);
+    /* border-top-left-radius: 9px;
+    border-top-right-radius: 9px; */
     grid-area: StudentAddmissionTitle;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 .AddPhoto {

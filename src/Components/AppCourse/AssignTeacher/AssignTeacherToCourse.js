@@ -479,19 +479,24 @@ const AssignTeacherToCourse = () => {
   return (
     <>
       <div className={containerCss}>
-        <div className="AssignTeacherTitle">
-          <Title level={3} style={{ textAlign: "left", marginBottom: 10 }}>
+        <div className="AssignTeacherTitle" style={{ marginBottom: 15 }}>
+          <Title
+            level={3}
+            style={{ textAlign: "left", marginLeft: 5, marginTop: 10 }}>
             Teachers List
           </Title>
         </div>
-        <div className="CourseListTitleAndSearchBar">
+        <div
+          className="CourseListTitleAndSearchBar"
+          style={{ marginBottom: 15 }}>
           <div className="CourseGroupSearchBar">
             <div
               style={{
                 display: "flex",
                 textAlign: "left",
-                marginBottom: 5,
-                marginTop: 27,
+                marginBottom: 0,
+                marginTop: 10,
+                marginRight: 5,
               }}>
               <Search
                 style={{ marginLeft: "30%" }}
@@ -509,6 +514,7 @@ const AssignTeacherToCourse = () => {
             <div className="AssignTeacherForm">{sectionsForEachGrade}</div>
             <div className="OnAssignTeacherTable">
               <Table
+                style={{ marginTop: 15 }}
                 //   bordered
                 dataSource={tableData}
                 columns={mergedColumns}
@@ -524,6 +530,7 @@ const AssignTeacherToCourse = () => {
             <div className="FullTableCss">
               <Form form={form} component={false}>
                 <Table
+                  style={{ marginTop: 15 }}
                   //   bordered
                   dataSource={tableData}
                   columns={mergedColumns}

@@ -268,12 +268,12 @@ const FeesGroup = () => {
         </div>
         <div className="FeesGroupForm">
           <Form form={addForm} onFinish={onFinish} style={{ display: "flex" }}>
-            <Form.Item name="feeName" style={{ width: "35%" }}>
+            <Form.Item name="feeName" style={{ minWidth: 400 }}>
               <Input placeholder="Enter Fee Name" />
             </Form.Item>
             <Form.Item
               name="feeType"
-              style={{ width: "35%", marginLeft: 15, textAlign: "left" }}>
+              style={{ minWidth: 400, marginLeft: 15, textAlign: "left" }}>
               <Select placeholder="Select Fee Type">
                 <Option value="Admission">Admission</Option>
                 <Option value="Monthly">Monthly</Option>
@@ -283,12 +283,12 @@ const FeesGroup = () => {
             </Form.Item>
             <Form.Item
               name="feeDueDate"
-              style={{ width: "35%", marginLeft: 15, textAlign: "left" }}>
+              style={{ marginLeft: 15, textAlign: "left" }}>
               <RangePicker format="DD-MM-YYYY" />
             </Form.Item>
-            <Form.Item style={{ width: "5%" }}>
+            <Form.Item style={{ marginLeft: 20 }}>
               <Button type="primary" htmlType="submit">
-                Add
+                Add Fee
               </Button>
             </Form.Item>
           </Form>

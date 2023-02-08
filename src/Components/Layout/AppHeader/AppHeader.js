@@ -15,7 +15,7 @@ const AppHeader = (props) => {
           background: colorBgContainer,
           position: "fixed",
           top: 0,
-          zIndex: 4,
+          zIndex: 100,
           width: "100%",
         }}>
         {React.createElement(

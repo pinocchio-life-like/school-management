@@ -40,9 +40,12 @@ const App = () => {
           />
           <Content
             style={{
+              // border: "1px solid red",
+              borderTop: "3px solid #4593FF",
+              borderTopLeftRadius: 5,
+              borderTopRightRadius: 5,
               margin: "84px 16px 24px 16px",
               overflow: "initial",
-              padding: 24,
               minHeight: 280,
               background: colorBgContainer,
             }}>

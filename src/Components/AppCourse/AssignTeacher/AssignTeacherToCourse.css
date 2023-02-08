@@ -11,10 +11,12 @@
 }
 
 .AssignTeacherTitle {
+    background-color: rgba(69, 147, 255, 0.3);
     grid-area: AssignTeacherTitle;
 }
 
 .CourseListTitleAndSearchBar {
+    background-color: rgba(69, 147, 255, 0.3);
     grid-area: CourseListTitleAndSearchBar;
 }
 

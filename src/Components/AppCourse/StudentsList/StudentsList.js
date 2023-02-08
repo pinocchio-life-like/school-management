@@ -473,8 +473,8 @@ const StudentsList = () => {
             }}>
             <Search
               style={{
-                border: "1px solid blue",
-                borderRadius: 8,
+                // border: "1px solid blue",
+                // borderRadius: 8,
                 marginLeft: "30%",
                 marginRight: 5,
               }}

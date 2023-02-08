@@ -29,7 +29,7 @@ const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 const StudentAdmission = () => {
-  const form = Form.useForm();
+  const [form] = Form.useForm();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
@@ -72,8 +72,7 @@ const StudentAdmission = () => {
               level={3}
               style={{
                 textAlign: "left",
-                marginTop: 0,
-                paddingTop: 8,
+                marginTop: 5,
                 marginLeft: 5,
               }}>
               Student Admission

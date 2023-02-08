@@ -116,7 +116,8 @@ const StudentDetail = () => {
             <div className="TabDetail">
               <Tabs
                 style={{ marginTop: 10, marginLeft: "10px" }}
-                defaultActiveKey="1">
+                defaultActiveKey="1"
+                animated>
                 <Tabs.TabPane tab="Profile" key="1">
                   <div style={{ display: "flex" }}>
                     <div

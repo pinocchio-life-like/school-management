@@ -11,6 +11,7 @@ import {
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "./CollectFees.css";
 const { Option } = Select;
 
@@ -123,7 +124,7 @@ const CollectFees = () => {
               onClick={() => {
                 console.log(record);
               }}>
-              Collect Fess
+              <Link to="/addFee">Collect Fess</Link>
             </Typography.Link>
           </Space>
         );

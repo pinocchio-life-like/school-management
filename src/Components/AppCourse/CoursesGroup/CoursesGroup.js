@@ -224,7 +224,9 @@ const CoursesGroup = () => {
     <div>
       <div className={containerCss}>
         <div className="CourseGroupTitle">
-          <Title level={3} style={{ textAlign: "left", marginBottom: 10 }}>
+          <Title
+            level={3}
+            style={{ textAlign: "left", marginTop: 5, marginBottom: 10 }}>
             Course Group List
           </Title>
         </div>
@@ -234,7 +236,8 @@ const CoursesGroup = () => {
               display: "flex",
               textAlign: "left",
               marginBottom: 5,
-              marginTop: 27,
+              marginTop: 7,
+              marginRight: 5,
             }}>
             <Search
               style={{ marginLeft: "30%" }}
@@ -251,7 +254,11 @@ const CoursesGroup = () => {
             <div className="EditCourseGroup">
               <Form
                 className="CourseGroupList"
-                style={{ justifyContent: "left", marginTop: 17 }}
+                style={{
+                  justifyContent: "left",
+                  marginTop: 17,
+                  marginRight: 15,
+                }}
                 form={addForm}
                 name="horizontal_login"
                 layout="vertical"
@@ -340,6 +347,7 @@ const CoursesGroup = () => {
             <div className="CourseGroupTableOnEdit">
               <Form form={form} component={false}>
                 <Table
+                  style={{ marginTop: 10 }}
                   //   bordered
                   dataSource={tableData}
                   columns={mergedColumns}
@@ -355,6 +363,7 @@ const CoursesGroup = () => {
           <div className="CourseGroupTable">
             <Form form={form} component={false}>
               <Table
+                style={{ marginTop: 10 }}
                 //   bordered
                 dataSource={tableData}
                 columns={mergedColumns}
