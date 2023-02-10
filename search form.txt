@@ -187,7 +187,7 @@ export default CourseSearchForm;
             <Input type="text" placeholder="Course Id" />
           </Form.Item>
 
-          <div class="CourseSaveButton">
+          <div className="CourseSaveButton">
             <Form.Item shouldUpdate>
               {() => (
                 <Button

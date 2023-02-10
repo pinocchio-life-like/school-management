@@ -35,6 +35,12 @@ const items = [
     getItem("Fees Group", "/feesGroup"),
     getItem("Collect Fees", "/collectFees"),
   ]),
+  getItem("Reports", "sub5", <TeamOutlined />, [
+    getItem("Reports", "/reports"),
+    // getItem("Collect Fees", "/collectFees"),
+    // getItem("Collect Fees", "/collectFees"),
+    // getItem("Collect Fees", "/collectFees"),
+  ]),
 ];
 const SideBarMenu = () => {
   const navigate = useNavigate();
