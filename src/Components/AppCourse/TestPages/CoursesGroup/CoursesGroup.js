@@ -1,4 +1,3 @@
-import { useLocation } from "react-router-dom";
 import {
   Button,
   Checkbox,
@@ -72,21 +71,12 @@ const originData = [
   },
 ];
 const CoursesGroup = () => {
-  const location = useLocation();
   const [form] = Form.useForm();
   const [addForm] = Form.useForm();
   const [editing, setEditing] = useState(false);
   const [recordBeingEdited, setRecordBeingEdited] = useState("");
   const [offeredCourses, setOfferedCourses] = useState([]);
   const [containerCss, setContainerCss] = useState("CourseGroupCSS");
-  let courses, notOffered;
-
-  courses = originData.map((course) => {
-    return <div>{course.courses}</div>;
-  });
-  notOffered = originData.map((course) => {
-    return <div>{course.notOffered}</div>;
-  });
 
   //   console.log(courses);
   const [tableData, setTableData] = useState([...originData]);

@@ -1,142 +1,192 @@
-import { useLocation } from "react-router-dom";
 import {
   Button,
   Checkbox,
   Col,
   Form,
+  message,
   Popconfirm,
   Row,
   Space,
+  Spin,
   Table,
   Typography,
 } from "antd";
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./CourseGroup.css";
 
 //original Data
-const originData = [
-  {
-    key: Math.random(),
-    courseName: `Grade 1 Courses Group`,
-    notOffered: "All Offered",
-    courses: (
-      <div>
-        <div>Mathemathics</div>
-        <div>English</div>
-        <div>Physical Education</div>
-        <div>Chemistry</div>
-      </div>
-    ),
-  },
-  {
-    key: Math.random(),
-    courseName: `Grade 2 Courses Group`,
-    notOffered: (
-      <div>
-        <div>Music</div>
-        <div>Informal English</div>
-      </div>
-    ),
-    courses: (
-      <div>
-        <div>Mathemathics</div>
-        <div>English</div>
-        <div>Physical Education</div>
-        <div>Chemistry</div>
-      </div>
-    ),
-  },
-  {
-    key: Math.random(),
-    courseName: `Grade 8 Courses Group `,
-    notOffered: (
-      <div>
-        <div>Literature</div>
-        <div>Computer Programming</div>
-      </div>
-    ),
-    courses: (
-      <div>
-        <div>Mathemathics</div>
-        <div>English</div>
-        <div>Physical Education</div>
-        <div>Chemistry</div>
-      </div>
-    ),
-  },
-];
+let originData = [];
 const CourseGroup = () => {
-  const location = useLocation();
   const [form] = Form.useForm();
   const [addForm] = Form.useForm();
   const [editing, setEditing] = useState(false);
   const [recordBeingEdited, setRecordBeingEdited] = useState("");
   const [offeredCourses, setOfferedCourses] = useState([]);
   const [containerCss, setContainerCss] = useState("CourseGroupCSS");
-  let importedData, courses, notOffered;
+  const [tableData, setTableData] = useState([]);
+  const [messageApi, contextHolder] = message.useMessage();
+  const [originalData, setOriginalData] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
 
-  if (location.state.courseGroup !== undefined) {
-    importedData = location.state.courseGroup;
-    courses = importedData.courses.map((course) => {
-      return <div>{course}</div>;
+  useEffect(() => {
+    const getCourseGroup = async () => {
+      const response = await fetch(
+        "http://localhost:8080/course/offeredCourses"
+      );
+      const responseData = await response.json();
+
+      try {
+        if (responseData.code === 404) {
+          throw new Error("Internet Connection Problem");
+        }
+
+        const courseGroup = responseData.coursesGroup;
+        setOriginalData(courseGroup);
+        const data = [];
+        for (let i = 0; i < courseGroup.length; i++) {
+          const offered = [];
+          for (let j = 0; j < courseGroup[i].offered.length; j++) {
+            offered.push(
+              <div key={Math.random()}>{courseGroup[i].offered[j]}</div>
+            );
+          }
+
+          const notOffered = [];
+          for (let j = 0; j < courseGroup[i].notOffered.length; j++) {
+            notOffered.push(
+              <div key={Math.random()}>{courseGroup[i].notOffered[j]}</div>
+            );
+          }
+          data.push({
+            key: courseGroup[i].id,
+            courseName: courseGroup[i].courseGroupName,
+            notOffered: <div key={Math.random()}>{notOffered}</div>,
+            courses: <div key={Math.random()}>{offered}</div>,
+          });
+        }
+        originData = data.map((data) => data);
+        setTableData([...originData]);
+      } catch (err) {
+        error("Check for your internet connection");
+      }
+    };
+    getCourseGroup();
+  }, []);
+
+  // Message handler
+  const success = (message) => {
+    messageApi.open({
+      type: "success",
+      content: message,
     });
-    notOffered = importedData.notOffered.map((course) => {
-      return <div>{course}</div>;
+  };
+  const error = (message) => {
+    messageApi.open({
+      type: "error",
+      content: message,
     });
-  }
-  //   console.log(courses);
-  const [tableData, setTableData] = useState(() => {
-    if (location.state.courseGroup) {
-      return [
+  };
+
+  const onFinish = async (values) => {
+    setIsSaving(true);
+    let indexValue;
+    const offeredId = [];
+    const notOffered = [];
+    let grade;
+    for (let i = 0; i < originalData.length; i++) {
+      if (originalData[i].id === recordBeingEdited.key) {
+        indexValue = i;
+        grade = originalData[i].grade;
+        originalData[i].offered.forEach((offer) => {
+          notOffered.push(offer);
+        });
+        originalData[i].notOffered.forEach((notOffer) => {
+          notOffered.push(notOffer);
+        });
+      }
+      for (let j = 0; j < values.courses.length; j++) {
+        for (let k = 0; k < originalData[i].offeredId.length; k++) {
+          if (originalData[i].offered[k] === values.courses[j]) {
+            offeredId.push(originalData[i].offeredId[k]);
+          }
+        }
+        let index = notOffered.indexOf(values.courses[j]);
+        notOffered.splice(index, 1);
+      }
+    }
+    const courseGroup = {
+      courseGroupName: recordBeingEdited.courseName,
+      offered: values.courses,
+      offeredId: offeredId,
+      notOffered: notOffered,
+      grade: grade,
+    };
+    try {
+      const response = await fetch(
+        "http://localhost:8080/course/offerCourses",
         {
-          key: Math.random(),
-          courseName: `${location.state.courseGroup.courseGroupName}`,
-          notOffered: <div>{notOffered}</div>,
-          courses: <div>{courses}</div>,
-        },
-        ...originData,
-      ];
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(courseGroup),
+        }
+      );
+      const responseData = await response.json();
+
+      if (responseData.code === 404) {
+        throw new Error("Couldnt Offer Course");
+      }
+      setIsSaving(false);
+      success("The Selected Courses Are Offered Successfully");
+      addForm.resetFields();
+      setContainerCss("CourseGroupCSS");
+      setEditing(false);
+    } catch (err) {
+      setIsSaving(false);
+      setContainerCss("CourseGroupCSS");
+      setEditing(false);
+      error("Couldnt Offer Course");
     }
-    return [...originData];
-  });
-  //   if (location.state.courseGroup) {
-  //     setTableData(location.state.courseGroup);
-  //   }
-  //   console.log(location.state.courseGroup);
-  //On finish adding course Group
-  const onFinish = (values) => {
-    console.log(recordBeingEdited.courses);
-    const indexValue = tableData.indexOf(recordBeingEdited);
-    console.log(values);
     const courses = values.courses.map((course) => {
-      return <div>{course}</div>;
+      return <div key={Math.random()}>{course}</div>;
     });
-    const notOffered = offeredCourses.map((nonOffered) => {
-      return nonOffered.props.children.props.value;
-    });
-    for (let i = 0; i < values.courses.length; i++) {
-      const indexValue = notOffered.indexOf(values.courses[i]);
-      notOffered.splice(indexValue, 1);
-    }
     const notOfferedAgain = notOffered.map((course) => {
-      return <div>{course}</div>;
+      return <div key={Math.random()}>{course}</div>;
     });
-    console.log(notOffered);
     tableData.splice(indexValue, 1, {
       key: tableData[indexValue].key,
       courseName: recordBeingEdited.courseName,
-      notOffered: <div>{notOfferedAgain}</div>,
-      courses: <div>{courses}</div>,
+      notOffered: <div key={Math.random()}>{notOfferedAgain}</div>,
+      courses: <div key={Math.random()}>{courses}</div>,
     });
     setTableData([...tableData]);
   };
   //delete Course Group
-  const deleteCourseGroup = (record) => {
-    const index = tableData.indexOf(record);
-    tableData.splice(index, 1);
-    setTableData([...tableData]);
+  const deleteCourseGroup = async (record) => {
+    setIsSaving(true);
+    try {
+      const response = await fetch(
+        `http://localhost:8080/course/courseGroup/${record.key}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const responseData = await response.json();
+      if (responseData.code === 404) {
+        throw new Error("Couldnt delete, check your internet");
+      }
+      success("Deleted Successfully");
+      const index = originData.indexOf(record);
+      originData.splice(index, 1);
+      setTableData([...originData]);
+      setIsSaving(false);
+    } catch (err) {
+      setIsSaving(false);
+      error("Check your Internet and try again");
+    }
   };
   //on change checkbox
   const onChangeCheckBox = (checkedValues) => {
@@ -195,11 +245,12 @@ const CourseGroup = () => {
                 const offer = offeredAntNotOffered.map((course) => {
                   return (
                     <Row>
-                      <Checkbox value={course}>{course}</Checkbox>
+                      <Checkbox key={Math.random()} value={course}>
+                        {course}
+                      </Checkbox>
                     </Row>
                   );
                 });
-
                 setOfferedCourses(offer);
                 setEditing(true);
                 setContainerCss("CourseGroupCSSOnEdit");
@@ -211,7 +262,7 @@ const CourseGroup = () => {
               onConfirm={() => {
                 deleteCourseGroup(record);
               }}>
-              <a>Delete</a>
+              <a onClick={() => {}}>Delete</a>
             </Popconfirm>
           </Space>
         );
@@ -238,122 +289,139 @@ const CourseGroup = () => {
   });
   return (
     <div>
-      <div className={containerCss}>
-        <div className="CourseGroupTitle">
-          <Title level={3} style={{ textAlign: "left", marginBottom: 10 }}>
-            Course Group List
-          </Title>
-        </div>
-        <div className="CourseGroupSearchBar">
-          <div
-            style={{
-              display: "flex",
-              textAlign: "left",
-              marginBottom: 5,
-              marginTop: 27,
-            }}>
-            <Search
-              style={{ marginLeft: "30%" }}
-              placeholder="input search text"
-              //   onSearch={onSearch}
-              // onChange={onSearchChange}
-              // onChange=
-              enterButton
-            />
+      {contextHolder}
+      <Spin spinning={isSaving}>
+        <div className={containerCss}>
+          <div className="CourseGroupTitle">
+            <Title level={3} style={{ textAlign: "left", marginBottom: 10 }}>
+              Course Group List
+            </Title>
           </div>
-        </div>
-        {editing ? (
-          <>
-            <div className="EditCourseGroup">
-              <Form
-                className="CourseGroupList"
-                style={{ justifyContent: "left", marginTop: 17 }}
-                form={addForm}
-                name="horizontal_login"
-                layout="vertical"
-                onFinish={onFinish}>
-                <Form.Item
-                  label={
-                    <>
-                      <span
-                        style={{
-                          color: "red",
-                          fontSize: "20px",
-                          paddingTop: "5px",
-                          marginRight: "2px",
-                        }}>
-                        *
-                      </span>
-                      {` Course Group Name`}
-                    </>
-                  }
-                  style={{
-                    after: { content: "*", color: "red" },
-                    minWidth: 200,
-                    textAlign: "left",
-                    "&::after": {
-                      content: "*",
-                      color: "red",
-                    },
-                  }}
-                  rules={[
-                    {
-                      required: false,
-                      message: "Please input course name!",
-                    },
-                  ]}>
-                  <div
-                    style={{
-                      border: "1px solid #AAE3E2",
-                      height: "33px",
-                      borderRadius: "6px",
-                      textAlign: "left",
-                      paddingTop: "4px",
-                      paddingLeft: "10px",
-                      marginTop: -10,
-                    }}
-                    // readOnly
-                    // defaultValue=
-                    // type="text"
-                    // placeholder="Course Id"
-                  >
-                    <strong>{recordBeingEdited.courseName}</strong>
-                  </div>
-                </Form.Item>
-                <Form.Item
-                  label="Courses"
-                  style={{ marginTop: -15, minWidth: 250, textAlign: "left" }}
-                  name="courses"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please Select courses!",
-                    },
-                  ]}>
-                  <Checkbox.Group
-                    style={{
-                      width: "100%",
-                      marginTop: -10,
-                    }}
-                    onChange={onChangeCheckBox}>
-                    <Col>{offeredCourses}</Col>
-                  </Checkbox.Group>
-                </Form.Item>
-                <div className="CourseSaveButton">
-                  <Form.Item shouldUpdate>
-                    {() => (
-                      <Button
-                        style={{ minWidth: 100, marginTop: 5 }}
-                        type="primary"
-                        htmlType="submit">
-                        Save
-                      </Button>
-                    )}
-                  </Form.Item>
-                </div>
-              </Form>
+          <div className="CourseGroupSearchBar">
+            <div
+              style={{
+                display: "flex",
+                textAlign: "left",
+                marginBottom: 5,
+                marginTop: 27,
+              }}>
+              <Search
+                style={{ marginLeft: "30%" }}
+                placeholder="input search text"
+                //   onSearch={onSearch}
+                // onChange={onSearchChange}
+                // onChange=
+                enterButton
+              />
             </div>
-            <div className="CourseGroupTableOnEdit">
+          </div>
+          {editing ? (
+            <>
+              <div className="EditCourseGroup">
+                <Form
+                  className="CourseGroupList"
+                  style={{ justifyContent: "left", marginTop: 17 }}
+                  form={addForm}
+                  name="horizontal_login"
+                  layout="vertical"
+                  onFinish={onFinish}>
+                  <Form.Item
+                    label={
+                      <>
+                        <span
+                          style={{
+                            color: "red",
+                            fontSize: "20px",
+                            paddingTop: "5px",
+                            marginRight: "2px",
+                          }}>
+                          *
+                        </span>
+                        {` Course Group Name`}
+                      </>
+                    }
+                    style={{
+                      after: { content: "*", color: "red" },
+                      minWidth: 200,
+                      textAlign: "left",
+                      "&::after": {
+                        content: "*",
+                        color: "red",
+                      },
+                    }}
+                    rules={[
+                      {
+                        required: false,
+                        message: "Please input course name!",
+                      },
+                    ]}>
+                    <div
+                      style={{
+                        border: "1px solid #AAE3E2",
+                        height: "33px",
+                        borderRadius: "6px",
+                        textAlign: "left",
+                        paddingTop: "4px",
+                        paddingLeft: "10px",
+                        marginTop: -10,
+                      }}
+                      // readOnly
+                      // defaultValue=
+                      // type="text"
+                      // placeholder="Course Id"
+                    >
+                      <strong>{recordBeingEdited.courseName}</strong>
+                    </div>
+                  </Form.Item>
+                  <Form.Item
+                    label="Courses"
+                    style={{ marginTop: -15, minWidth: 250, textAlign: "left" }}
+                    name="courses"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please Select courses!",
+                      },
+                    ]}>
+                    <Checkbox.Group
+                      style={{
+                        width: "100%",
+                        marginTop: -10,
+                      }}
+                      onChange={onChangeCheckBox}>
+                      <Col>{offeredCourses}</Col>
+                    </Checkbox.Group>
+                  </Form.Item>
+                  <div className="CourseSaveButton">
+                    <Form.Item shouldUpdate>
+                      {() => (
+                        <Button
+                          style={{ minWidth: 100, marginTop: 5 }}
+                          type="primary"
+                          htmlType="submit">
+                          Save
+                        </Button>
+                      )}
+                    </Form.Item>
+                  </div>
+                </Form>
+              </div>
+              <div className="CourseGroupTableOnEdit">
+                <Form form={form} component={false}>
+                  <Table
+                    //   bordered
+                    dataSource={tableData}
+                    columns={mergedColumns}
+                    rowClassName="editable-row"
+                    pagination={{
+                      onChange: deleteCourseGroup,
+                    }}
+                  />
+                </Form>
+              </div>
+            </>
+          ) : (
+            <div className="CourseGroupTable">
               <Form form={form} component={false}>
                 <Table
                   //   bordered
@@ -366,23 +434,9 @@ const CourseGroup = () => {
                 />
               </Form>
             </div>
-          </>
-        ) : (
-          <div className="CourseGroupTable">
-            <Form form={form} component={false}>
-              <Table
-                //   bordered
-                dataSource={tableData}
-                columns={mergedColumns}
-                rowClassName="editable-row"
-                pagination={{
-                  onChange: deleteCourseGroup,
-                }}
-              />
-            </Form>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </Spin>
     </div>
   );
 };

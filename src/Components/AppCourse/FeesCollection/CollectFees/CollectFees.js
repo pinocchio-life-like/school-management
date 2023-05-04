@@ -7,70 +7,63 @@ import {
   Space,
   Table,
   Typography,
+  message,
 } from "antd";
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./CollectFees.css";
 const { Option } = Select;
 
-const originData = [
-  {
-    key: Math.random(),
-    grade: "Grade 1",
-    section: "A",
-    admissionNumber: "00023",
-    studentName: "Gamachis Kuma",
-    fatherName: "Kuma Demeka",
-    phone: "+251978544325",
-    dob: "02-20-2000",
-  },
-  {
-    key: Math.random(),
-    grade: "Grade 1",
-    section: "A",
-    admissionNumber: "00023",
-    studentName: "Biru Feje",
-    fatherName: "Demeka Qamaa",
-    phone: "+251978544325",
-    dob: "02-20-2000",
-  },
-  {
-    key: Math.random(),
-    grade: "Grade 1",
-    section: "A",
-    admissionNumber: "00023",
-    studentName: "John Gadisa",
-    fatherName: "shabel Garre",
-    phone: "+251978544325",
-    dob: "02-20-2000",
-  },
-  {
-    key: Math.random(),
-    grade: "Grade 1",
-    section: "B",
-    admissionNumber: "00023",
-    studentName: "Stiff Gome",
-    fatherName: "Abelu Demeka",
-    phone: "+251978544325",
-    dob: "02-20-2000",
-  },
-  {
-    key: Math.random(),
-    grade: "Grade 1",
-    section: "B",
-    admissionNumber: "00023",
-    studentName: "Mann Steller",
-    fatherName: "Steller Mann",
-    phone: "+251978544325",
-    dob: "02-20-2000",
-  },
-];
+let originData = [];
 const CollectFees = () => {
   const [form] = Form.useForm();
   const [tableForm] = Form.useForm();
   const [tableData, setTableData] = useState([]);
+  const [messageApi, contextHolder] = message.useMessage();
+
+  useEffect(() => {
+    const getStudents = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8080/admission/studentsList"
+        );
+        const responseData = await response.json();
+        if (responseData.code === 404) {
+          throw new Error("No students found");
+        }
+
+        originData = responseData.students.map((data) => {
+          return {
+            key: data.admissionNumber,
+            grade: data.grade,
+            section: data.section,
+            admissionNumber: data.admissionNumber,
+            studentName: `${data.firstName} ${data.lastName}`,
+            fatherName: `${data.parentFirstName} ${data.parentLastName}`,
+            phone: data.parentPhoneNumber,
+            dob: data.birthDate.slice(0, 10),
+          };
+        });
+      } catch (err) {
+        error("Check your Internet Connection please!");
+      }
+    };
+    getStudents();
+  }, []);
+  const success = (message) => {
+    messageApi.open({
+      type: "success",
+      content: message,
+    });
+  };
+  const error = (message) => {
+    messageApi.open({
+      type: "error",
+      content: message,
+    });
+  };
   const onFinish = (values) => {
     const data = originData.filter((filter) => {
       return filter.grade === values.grade && filter.section === values.section;
@@ -122,7 +115,7 @@ const CollectFees = () => {
           <Space size="middle">
             <Typography.Link
               onClick={() => {
-                console.log(record);
+                localStorage.setItem("payingStudent", record.key);
               }}>
               <Link to="/addFee">Collect Fess</Link>
             </Typography.Link>
@@ -133,6 +126,7 @@ const CollectFees = () => {
   ];
   return (
     <div>
+      {contextHolder}
       <div className="CollectFeesPageCss">
         <div className="CollectFeesTitle">
           <Title
@@ -157,6 +151,8 @@ const CollectFees = () => {
                   <Option value="Grade 4">Grade 4</Option>
                   <Option value="Grade 5">Grade 5</Option>
                   <Option value="Grade 6">Grade 6</Option>
+                  <Option value="Grade 7">Grade 7</Option>
+                  <Option value="Grade 8">Grade 8</Option>
                 </Select>
               </Form.Item>
               <Form.Item

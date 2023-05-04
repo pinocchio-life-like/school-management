@@ -13,117 +13,273 @@ import {
   Col,
 } from "antd";
 import Title from "antd/es/typography/Title";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./AssignTeacherToCourse.css";
 const { Search } = Input;
 const { Option } = Select;
 
-const originData = [
-  {
-    key: Math.random(),
-    teacherName: `Alemu Abera`,
-    grade: (
-      <>
-        <ul>
-          <li style={{ marginLeft: -20, display: "inline" }}>Grade 7</li>
-          <li>Mathemathics A B C</li>
-          <li>English A C</li>
-          <li style={{ marginLeft: -20, display: "inline" }}>Grade 8</li>
-          <li>Mathemathics A</li>
-          <li>Chemistry A C</li>
-        </ul>
-      </>
-    ),
-    assigned: "Assigned",
-    teacher: `Not Assigned`,
-  },
-  {
-    key: Math.random(),
-    teacherName: `Abebe Tafese`,
-    grade: (
-      <>
-        <ul>
-          <li style={{ marginLeft: -20, display: "inline" }}>Grade 7</li>
-          <li>Mathemathics A B C</li>
-          <li>English A C</li>
-          <li style={{ marginLeft: -20, display: "inline" }}>Grade 8</li>
-          <li>Mathemathics A</li>
-          <li>English A C</li>
-        </ul>
-      </>
-    ),
-    assigned: "Assigned",
-  },
-  {
-    key: Math.random(),
-    teacherName: `Alemu Shega`,
-    grade: (
-      <>
-        <ul>
-          <li style={{ marginLeft: -20, display: "inline" }}>Grade 2</li>
-          <li>English</li>
-        </ul>
-      </>
-    ),
-    assigned: "Not Assigned",
-  },
-  {
-    key: Math.random(),
-    teacherName: `Shafi Ahmed`,
-    grade: (
-      <>
-        <ul>
-          <li style={{ marginLeft: -20, display: "inline" }}>Grade 2</li>
-          <li>English</li>
-        </ul>
-      </>
-    ),
-    assigned: "Not Assigned",
-  },
-  {
-    key: Math.random(),
-    teacherName: `Gemeda Tola`,
-    grade: (
-      <>
-        <ul>
-          <li style={{ marginLeft: -20, display: "inline" }}>Grade 2</li>
-          <li>English</li>
-        </ul>
-      </>
-    ),
-    assigned: "Not Assigned",
-  },
-  {
-    key: Math.random(),
-    teacherName: `Abebe Mola`,
-    grade: (
-      <>
-        <ul>
-          <li style={{ marginLeft: -20, display: "inline" }}>Grade 2</li>
-          <li>English</li>
-        </ul>
-      </>
-    ),
-    assigned: "Not Assigned",
-  },
-];
+let originData = [];
+let originalData = [];
+let courseData = [];
+let tableRecord = [];
 
 // Editable Cell
+const convertData = (data) => {
+  console.log(data);
+  let result = {
+    key: data.key,
+    teacherName: data.teacherName,
+    grade: { props: { children: [] } },
+    status: data.status,
+  };
+  // console.log(data);
+  data.grade.forEach((grade, index) => {
+    let gradeCourses = data.coursesId[index];
+    // console.log(gradeCourses);
+    let gradeSections = [];
+    data.assignedTo.forEach((item) => {
+      if (gradeCourses.includes(item.coursesId)) {
+        gradeSections.push(...item.sections);
+      }
+    });
+    result.grade.props.children.push(
+      <li style={{ marginLeft: -20, display: "inline" }}>{grade}</li>
+    );
 
+    gradeCourses.forEach((course, courseIndex) => {
+      let sections = [];
+      gradeSections.forEach((item) => {
+        if (item.coursesId === course) {
+          sections.push(item.sections.join(" "));
+        }
+      });
+      result.grade.props.children.push(
+        <li>
+          {course} {sections.join(", ")}
+        </li>
+      );
+    });
+  });
+  return result;
+};
 const AssignTeacherToCourse = () => {
   const [form] = Form.useForm();
   const [addForm] = Form.useForm();
-  const [editingKey, setEditingKey] = useState("");
   const [editing, setEditing] = useState(false);
-  const [assigning, setAssigning] = useState(false);
-  const [assigningKey, setAssigningKey] = useState("");
   const [containerCss, setContainerCss] = useState("FullTableContainerCss");
-  const isEditing = (record) => record.key === editingKey;
   const [messageApi, contextHolder] = message.useMessage();
-  const isAssigning = (record) => record.key === assigningKey;
   const [sectionsForEachGrade, setSectionsForEachGrade] = useState([]);
   const [tableData, setTableData] = useState(originData);
 
+  useEffect(() => {
+    const getClasses = async () => {
+      const response = await fetch("http://localhost:8080/teacher/teacherList");
+      const responseData = await response.json();
+      console.log(responseData.teachers);
+      const courseResponse = await fetch(
+        "http://localhost:8080/course/courseBreakDown"
+      );
+      const coursesData = await courseResponse.json();
+      courseData = coursesData.courses;
+      const data = [];
+      const originaldata = [];
+      for (let i = 0; i < responseData.teachers.length; i++) {
+        let grade = [];
+        let normalGrade = [];
+        let insideCourse = [];
+        for (let k = 0; k < responseData.teachers[i].coursesId.length; k++) {
+          const course = [];
+          for (let j = 0; j < courseData.length; j++) {
+            // console.log(responseData.teachers[i].coursesId[k]);
+            for (
+              let l = 0;
+              l < responseData.teachers[i].coursesId[k].length;
+              l++
+            ) {
+              if (
+                courseData[j].grade === responseData.teachers[i].grade[k] &&
+                courseData[j].courseId ===
+                  responseData.teachers[i].coursesId[k][l]
+              ) {
+                course.push(courseData[j].courseName);
+              }
+            }
+          }
+          insideCourse.push({
+            coursesId: responseData.teachers[i].coursesId[k],
+            grade: responseData.teachers[i].grade[k],
+            courseName: course,
+          });
+        }
+        // console.log(insideCourse);
+        for (let j = 0; j < insideCourse.length; j++) {
+          const courseName = [];
+          const courseId = [];
+          for (let l = 0; l < insideCourse[j].courseName.length; l++) {
+            // console.log(insideCourse[j].courseName[l]);
+            courseName.push(
+              <li key={Math.random()}>{insideCourse[j].courseName[l]}</li>
+            );
+            courseId.push(insideCourse[j].coursesId[l]);
+          }
+          grade.push(
+            <>
+              <ul>
+                <li
+                  key={Math.random()}
+                  style={{ marginLeft: -20, display: "inline" }}>
+                  {insideCourse[j].grade}
+                </li>
+                {courseName}
+              </ul>
+            </>
+          );
+          normalGrade.push(insideCourse[j].grade);
+        }
+
+        let coursesId = [];
+        let normalID = [];
+        for (let j = 0; j < responseData.teachers[i].coursesId.length; j++) {
+          coursesId.push(
+            <p key={Math.random()}>{responseData.teachers[i].coursesId[j]}</p>
+          );
+          normalID.push(responseData.teachers[i].coursesId[j]);
+        }
+        const sectionsSet = responseData.teachers[i].assignedTo.map((obj) => ({
+          [obj.coursesId]: obj.sections.join(", "),
+        }));
+
+        const listValues = sectionsSet.map((obj) => {
+          return (
+            <li key={Math.random()}>
+              {Object.keys(obj)[0]} : {Object.values(obj)[0]}
+            </li>
+          );
+        });
+
+        data.push({
+          key: responseData.teachers[i].teacherId,
+          teacherName: responseData.teachers[i].teacherName,
+          grade: grade,
+          coursesId: <>{coursesId}</>,
+          competitionalLevel: responseData.teachers[i].competitionalLevel,
+          status: (
+            <ul style={{ listStyleType: "none", padding: 0 }}>{listValues}</ul>
+          ),
+          assignedTo: responseData.teachers[i].assignedTo,
+        });
+        console.log(data);
+
+        originaldata.push({
+          key: responseData.teachers[i].teacherId,
+          teacherName: responseData.teachers[i].teacherName,
+          grade: normalGrade,
+          coursesId: normalID,
+          competitionalLevel: responseData.teachers[i].competitionalLevel,
+          status: responseData.teachers[i].status,
+          assignedTo: responseData.teachers[i].assignedTo,
+        });
+      }
+      originalData = originaldata.map((data) => data);
+      originData = data.map((data) => data);
+      setTableData([...originData]);
+    };
+    getClasses();
+  }, []);
+
+  const success = (message) => {
+    messageApi.open({
+      type: "success",
+      content: message,
+    });
+  };
+  const error = (message) => {
+    messageApi.open({
+      type: "error",
+      content: message,
+    });
+  };
+
+  //on Assingn Finish
+  const onFinish = async (values) => {
+    // console.log(values);
+    const record = tableRecord;
+    // console.log(record);
+    let data = [];
+    const coursesId = [];
+    const assignedTo = [];
+    data.teacherId = record.key;
+    data.teacherName = record.teacherName;
+    Object.entries(values).forEach(([key, value]) => {
+      // console.log(key, value);
+      if (String(key) === "grade") {
+        data.grade = value;
+      }
+      if (String(key).slice(1) === "Courses") {
+        coursesId.push(value);
+      }
+      if (String(key).slice(-8) === "Sections") {
+        assignedTo.push({
+          coursesId: `${String(key).slice(1, 7)}`,
+          sections: value,
+        });
+        // data[`${String(key).slice(1, 7)}`] = value;
+      }
+    });
+    data.coursesId = coursesId;
+    data.assignedTo = assignedTo;
+    const { competitionalLevel } = originalData.find((data) => {
+      return data.key === record.key;
+    });
+    data.competitionalLevel = competitionalLevel;
+    data.status =
+      // data.assignedTo[0].sections.length > 0 ?
+      "Assigned";
+    // : "Not Assigned";
+    // console.log(data);
+
+    try {
+      await fetch("http://localhost:8080/teacher/teacherList", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          teacherId: data.teacherId,
+          teacherName: data.teacherName,
+          competitionalLevel: data.competitionalLevel,
+          grade: data.grade,
+          status: data.status,
+          coursesId: data.coursesId,
+          assignedTo: data.assignedTo,
+        }),
+      });
+      success("Teacher Successfully Assigned");
+    } catch (err) {
+      error("Check your Internet and try Again");
+      return;
+    }
+
+    const sectionsSet = assignedTo.map((obj) => ({
+      [obj.coursesId]: obj.sections.join(", "),
+    }));
+
+    const listValues = sectionsSet.map((obj) => {
+      return (
+        <li key={Math.random()}>
+          {Object.keys(obj)[0]} : {Object.values(obj)[0]}
+        </li>
+      );
+    });
+
+    data.status = (
+      <ul style={{ listStyleType: "none", padding: 0 }}>{listValues}</ul>
+    );
+    tableData.splice(tableData.indexOf(tableRecord), 1, data);
+    setTableData([...tableData]);
+    setEditing(false);
+    setContainerCss("FullTableContainerCss");
+  };
   //table columns data
 
   const columns = [
@@ -143,85 +299,105 @@ const AssignTeacherToCourse = () => {
     },
     {
       title: "Status",
-      dataIndex: "assigned",
+      dataIndex: "status",
       width: "15%",
       editable: true,
       Assignable: true,
     },
     {
-      width: "25%",
+      width: "15%",
       title: "operation",
       dataIndex: "operation",
       render: (_, record) => {
         return (
           <Space size="middle">
             <Typography.Link
-              disabled={editing}
+              // disabled={editing}
               // disabled={editingKey !== ""}
               onClick={() => {
+                tableRecord = record;
+                const teacherNameRender = (
+                  <Form.Item
+                    initialValue={record.teacherName}
+                    label="Teacher Name"
+                    style={{ minWidth: 200 }}
+                    name={`teacherName`}>
+                    <Input
+                      disabled
+                      style={{ marginTop: -25 }}
+                      // onChange={onCourseNameChange}
+                      type="text"
+                      placeholder="Course Name"
+                    />
+                  </Form.Item>
+                );
                 setEditing(true);
                 setContainerCss("OnAssignTeacherContainer");
-                const listLength =
-                  record.grade.props.children.props.children.length;
-                const grade = [],
-                  course = [],
-                  section = [];
-                let singleGrade;
-                const courseForGrade = [];
-                for (let i = 0; i < listLength; i++) {
-                  if (
-                    record.grade.props.children.props.children[i].props.style
-                  ) {
-                    singleGrade =
-                      record.grade.props.children.props.children[i].props
-                        .children;
-                    grade.push(
-                      record.grade.props.children.props.children[i].props
-                        .children
-                    );
-                  } else if (
-                    !record.grade.props.children.props.children[i].props.style
-                  ) {
-                    let courseAndSection =
-                      record.grade.props.children.props.children[i].props
-                        .children;
-                    let courses = courseAndSection.split(" ");
-                    let sections = courses.filter((course) => {
-                      return course !== courses[0];
-                    });
-                    course.push(courses[0]);
-                    section.push(sections);
-                    courseForGrade.push({
-                      grade: singleGrade,
-                      course: courses[0],
-                      sections: sections,
-                    });
+                const indexVal = originData.indexOf(record);
+                let theData = convertData(originalData[indexVal]);
+                let grade = theData.grade;
+
+                const gradeValues = grade.props.children.map(
+                  (child, index) => child.props.children
+                );
+
+                // console.log(gradeValues);
+                let currentIndex = -1;
+                const result = [];
+                gradeValues.forEach((value) => {
+                  if (String(value) && String(value).startsWith("Grade")) {
+                    currentIndex++;
+                    result[currentIndex] = { grade: value, courses: [] };
+                  } else if (result[currentIndex]) {
+                    // console.log(value);
+                    let [course, ...sectionsString] = value;
+                    let sections = sectionsString;
+                    let courseObj = { course, sections };
+                    result[currentIndex].courses.push(courseObj);
                   }
-                }
+                });
+                // console.log(result);
+
                 const courseDefaultValue = [];
                 const GradeCourseSection = [];
                 const gradeDefaultValue = [];
-                for (let i = 0; i < grade.length; i++) {
+                const grad = [];
+                const options = [];
+                for (let i = 0; i < result.length; i++) {
+                  grad.push(result[i].grade);
                   const courseForGradeInOne = [];
                   const insideCourses = [];
-                  for (let j = 0; j < courseForGrade.length; j++) {
-                    if (grade[i] === courseForGrade[j].grade) {
-                      insideCourses.push(courseForGrade[j].course);
-                      courseForGradeInOne.push({
-                        courses: courseForGrade[j].course,
-                        sections: courseForGrade[j].sections,
-                      });
+                  for (let j = 0; j < result[i].courses.length; j++) {
+                    for (let l = 0; l < courseData.length; l++) {
+                      if (result[i].grade === courseData[l].grade) {
+                        options.push({
+                          courseName: courseData[l].courseName,
+                          grade: result[i].grade,
+                          courseId: courseData[l].courseId,
+                        });
+                      }
                     }
+                    insideCourses.push(result[i].courses[j].course);
+                    const { courseName } = courseData.find((data) => {
+                      return result[i].courses[j].course === data.courseId;
+                    });
+
+                    courseForGradeInOne.push({
+                      courses: result[i].courses[j].course,
+                      sections: result[i].courses[j].sections,
+                      courseName: courseName,
+                    });
                   }
                   courseDefaultValue.push(insideCourses);
                   GradeCourseSection.push({
-                    grade: grade[i],
+                    grade: result[i].grade,
                     courses: courseForGradeInOne,
                   });
                 }
+
                 gradeDefaultValue.push(
                   <Form.Item
-                    initialValue={grade}
+                    initialValue={grad}
                     label="Grade"
                     style={{
                       minWidth: 200,
@@ -247,8 +423,19 @@ const AssignTeacherToCourse = () => {
                   </Form.Item>
                 );
                 const gradeRender = [];
+                // console.log("options", options);
                 for (let i = 0; i < GradeCourseSection.length; i++) {
                   const courseRender = [];
+                  const option = [];
+                  for (let j = 0; j < options.length; j++) {
+                    if (options[j].grade === GradeCourseSection[i].grade) {
+                      option.push(
+                        <Option value={`${options[j].courseId}`}>
+                          {options[j].courseName}
+                        </Option>
+                      );
+                    }
+                  }
                   for (
                     let j = 0;
                     j < GradeCourseSection[i].courses.length;
@@ -270,7 +457,7 @@ const AssignTeacherToCourse = () => {
                     courseRender.push(
                       <Form.Item
                         initialValue={checkedSections}
-                        label={`${GradeCourseSection[i].grade} ${GradeCourseSection[i].courses[j].courses} Sections`}
+                        label={`${GradeCourseSection[i].grade} ${GradeCourseSection[i].courses[j].courseName} Sections`}
                         style={{
                           minWidth: 200,
                           textAlign: "left",
@@ -296,6 +483,7 @@ const AssignTeacherToCourse = () => {
                       </Form.Item>
                     );
                   }
+                  // console.log(option);
                   gradeRender.push(
                     <>
                       <Form.Item
@@ -317,11 +505,7 @@ const AssignTeacherToCourse = () => {
                           style={{ marginTop: -25 }}
                           onChange={onCourseSelectChange}
                           placeholder="Select Courses">
-                          <Option value="Mathemathics">Mathemathics</Option>
-                          <Option value="English">English</Option>
-                          <Option value="Chemistry">Chemistry</Option>
-                          <Option value="Biology">Biology</Option>
-                          <Option value="Physics">Physics</Option>
+                          {option}
                         </Select>
                       </Form.Item>
                       {courseRender}
@@ -332,78 +516,13 @@ const AssignTeacherToCourse = () => {
                 const wholeFormRender = [];
                 wholeFormRender.push(
                   <Form
-                    style={{ justifyContent: "left", marginTop: 17 }}
+                    style={{ justifyContent: "left", marginTop: -12 }}
                     form={addForm}
                     name="horizontal_login"
                     layout="vertical"
-                    onFinish={(values) => {
-                      // console.log(values);
-                      const list = [];
-                      Object.entries(values).forEach(([key, value]) => {
-                        if (key === "grade") {
-                          for (let i = 0; i < grade.length; i++) {
-                            let gradeString = "";
-                            gradeString = `${gradeString}`.concat(
-                              `${grade[i]} `
-                            );
-                            list.push(
-                              <li
-                                style={{ marginLeft: -20, display: "inline" }}>
-                                {gradeString}
-                              </li>
-                            );
-                            // console.log(gradeString);
-                            Object.entries(values).forEach(([key, value]) => {
-                              if (
-                                key.slice(-8) === "Sections" &&
-                                key.slice(0, 1) === `${grade[i]}`.slice(-1)
-                              ) {
-                                let sectionString = "";
-                                for (let i = 0; i < value.length; i++) {
-                                  sectionString = `${sectionString} `.concat(
-                                    `${value[i]}`
-                                  );
-                                }
-                                let otherList = `${key
-                                  .slice(1)
-                                  .slice(0, -8)}${sectionString}`;
-                                list.push(<li>{otherList}</li>);
-                              }
-                            });
-                          }
-                        }
-                      });
-                      const indexValue = tableData.indexOf(record);
-                      // console.log(indexValue);
-                      tableData.splice(indexValue, 1, {
-                        key: Math.random(),
-                        teacherName: values.teacherName,
-                        grade: (
-                          <>
-                            <ul>{list}</ul>
-                          </>
-                        ),
-                        assigned: "Assigned",
-                      });
-                      // console.log(originData);
-                      setTableData([...originData]);
-                      setEditing(false);
-                      setContainerCss("FullTableContainerCss");
-                    }}>
-                    <Form.Item
-                      initialValue={record.teacherName}
-                      label="Teacher Name"
-                      style={{ minWidth: 200 }}
-                      name={`teacherName`}>
-                      <Input
-                        style={{ marginTop: -25 }}
-                        // onChange={onCourseNameChange}
-                        type="text"
-                        placeholder="Course Name"
-                      />
-                    </Form.Item>
+                    onFinish={onFinish}>
+                    {teacherNameRender}
                     {gradeDefaultValue}
-
                     {gradeRender}
                     <div className="CourseSaveButton">
                       <Form.Item shouldUpdate>
@@ -423,7 +542,7 @@ const AssignTeacherToCourse = () => {
                 // grade.length = 0;
                 addForm.resetFields();
               }}>
-              Assign | Edit
+              Assign
             </Typography.Link>
             <Popconfirm
               title="Sure want to delete?"
@@ -460,14 +579,14 @@ const AssignTeacherToCourse = () => {
   });
   //on Grade Select Change
   const onGradeSelectChange = (value) => {
-    console.log(value);
+    // console.log(value);
   };
   const onCourseSelectChange = (value) => {
-    console.log(value);
+    // console.log(value);
   };
   //on Change Checkbox
   const onChangeCheckBox = (checkedValues) => {
-    console.log("checked = ", checkedValues);
+    // console.log("checked = ", checkedValues);
   };
   //Delete handler
   const deleteCourse = (record) => {
@@ -478,6 +597,7 @@ const AssignTeacherToCourse = () => {
 
   return (
     <>
+      {contextHolder}
       <div className={containerCss}>
         <div className="AssignTeacherTitle" style={{ marginBottom: 15 }}>
           <Title

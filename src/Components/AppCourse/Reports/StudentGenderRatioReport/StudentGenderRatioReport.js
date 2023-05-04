@@ -87,12 +87,12 @@ const columns = [
     },
   },
   {
-    title: "Boy : Girl Ratio",
+    title: "Boy : Girl",
     dataIndex: "boyGirlRatio",
-    width: "10%",
+    width: "8%",
     render: (_, record) => {
       let ratio = record.totalGirls / record.totalBoys;
-      return `1:${ratio}`;
+      return `1:${ratio}`.slice(0, 6);
     },
   },
 ];
@@ -104,11 +104,15 @@ const StudentGenderRatioReport = () => {
           textAlign: "left",
           marginBottom: 10,
           marginTop: 0,
-          width: "20%",
+          display: "flex",
+          justifyContent: "space-between",
         }}>
-        <Title level={4}>Class And Section Report</Title>
+        <Title style={{ marginTop: 0 }} level={4}>
+          Class And Section Report
+        </Title>
         <div>
           <Search
+            enterButton
             placeholder="input search text"
             // onSearch={onSearch}
             style={{

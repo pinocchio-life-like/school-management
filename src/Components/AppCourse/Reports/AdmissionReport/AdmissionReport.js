@@ -3,127 +3,17 @@ import {
   DatePicker,
   Form,
   Input,
+  message,
   Select,
   Table,
   Typography,
 } from "antd";
 import Title from "antd/es/typography/Title";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const { Text } = Typography;
-const originData = [
-  {
-    key: Math.random(),
-    admissionNumber: "23563",
-    studentName: "John Kittessa",
-    gender: "Male",
-    class: "8",
-    fatherName: "Kittessa Dhugumaa",
-    dob: "02-12-2000",
-    admissionDate: "2022-01-12",
-    mobileNumber: "+9876545672",
-  },
-  {
-    key: Math.random(),
-    admissionNumber: "23563",
-    studentName: "Abebe Mola",
-    gender: "Male",
-    class: "8",
-    fatherName: "Mola Andu",
-    dob: "02-12-2000",
-    admissionDate: "2023-01-23",
-    mobileNumber: "+9876545672",
-  },
-  {
-    key: Math.random(),
-    admissionNumber: "23563",
-    studentName: "Sileshih Seyfu",
-    gender: "Male",
-    class: "8",
-    fatherName: "Seyfu Fantaye",
-    dob: "02-12-2000",
-    admissionDate: "2023-02-05",
-    mobileNumber: "+9876545672",
-  },
-  {
-    key: Math.random(),
-    admissionNumber: "23563",
-    studentName: "Nahoo Timber",
-    gender: "Male",
-    class: "10",
-    fatherName: "Timber Isnow",
-    dob: "02-12-2000",
-    admissionDate: "2023-02-09",
-    mobileNumber: "+9876545672",
-  },
-  {
-    key: Math.random(),
-    admissionNumber: "23563",
-    studentName: "Gadise Alemu",
-    gender: "Female",
-    class: "9",
-    fatherName: "Alemu Yilma",
-    dob: "03-01-1999",
-    admissionDate: "2023-02-01",
-    mobileNumber: "+2345676543",
-  },
-  {
-    key: Math.random(),
-    admissionNumber: "23563",
-    studentName: "Getahun Worku",
-    gender: "Male",
-    class: "9",
-    fatherName: "Worku Taye",
-    dob: "03-01-1999",
-    admissionDate: "2022-12-21",
-    mobileNumber: "+2345676543",
-  },
-  {
-    key: Math.random(),
-    admissionNumber: "23563",
-    studentName: "Worku Afera",
-    gender: "Male",
-    class: "9",
-    fatherName: "Afera Taye",
-    dob: "03-01-1999",
-    admissionDate: "2022-02-21",
-    mobileNumber: "+2345676543",
-  },
-  {
-    key: Math.random(),
-    admissionNumber: "23563",
-    studentName: "Simon Worku",
-    gender: "Male",
-    class: "9",
-    fatherName: "Worku Gamo",
-    dob: "03-01-1999",
-    admissionDate: "2022-05-11",
-    mobileNumber: "+2345676543",
-  },
-  {
-    key: Math.random(),
-    admissionNumber: "23563",
-    studentName: "Getahun Worku",
-    gender: "Male",
-    class: "9",
-    fatherName: "Worku Taye",
-    dob: "03-01-1999",
-    admissionDate: "2022-09-21",
-    mobileNumber: "+2345676543",
-  },
-  {
-    key: Math.random(),
-    admissionNumber: "23563",
-    studentName: "Shamil Kamil",
-    gender: "Male",
-    class: "9",
-    fatherName: "Kamil Aamir",
-    dob: "03-01-1999",
-    admissionDate: "2022-03-18",
-    mobileNumber: "+2345676543",
-  },
-];
+let originData = [];
 const columns = [
   {
     title: "Admission Number",
@@ -142,12 +32,12 @@ const columns = [
   },
   {
     title: "Class",
-    dataIndex: "class",
+    dataIndex: "grade",
     width: "",
   },
   {
     title: "Father Name",
-    dataIndex: "fatherName",
+    dataIndex: "parentName",
     width: "",
   },
   {
@@ -170,6 +60,7 @@ const AdmissionReport = () => {
   const [searchForm] = Form.useForm();
   const [periodRender, setPeriodRender] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+  const [messageApi, contextHolder] = message.useMessage();
   const onDateRangeChange = (value) => {
     let start = new Date(value[0]);
     let end = new Date(value[1]);
@@ -182,6 +73,49 @@ const AdmissionReport = () => {
     setFilteredData([...data]);
   };
 
+  useEffect(() => {
+    const getStudents = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8080/admission/studentsList"
+        );
+        const responseData = await response.json();
+        if (responseData.code === 404) {
+          throw new Error("No students found");
+        }
+        // setStudentsList(responseData.students);
+        const originalData = responseData.students;
+        const data = originalData.map((data) => {
+          return {
+            key: data.admissionNumber,
+            admissionNumber: data.admissionNumber,
+            studentName: `${data.firstName} ${data.lastName}`,
+            gender: data.gender,
+            grade: data.grade,
+            parentName: `${data.parentFirstName} ${data.parentLastName}`,
+            dob: data.birthDate.slice(0, 10),
+            admissionDate: data.admissionDate,
+            mobileNumber: data.parentPhoneNumber,
+          };
+        });
+        originData = data;
+        // setFilteredData(data);
+      } catch (err) {
+        // setSearchIsLoading(false);
+        error("Check for your internet connection and try again");
+        return;
+      }
+    };
+    getStudents();
+  }, []);
+
+  //error message
+  const error = (message) => {
+    messageApi.open({
+      type: "error",
+      content: message,
+    });
+  };
   const onChangeDate = (value) => {
     if (value === "Period") {
       setPeriodRender(
@@ -295,22 +229,28 @@ const AdmissionReport = () => {
   };
   return (
     <div>
-      <div style={{ display: "flex" }}>
+      {contextHolder}
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+        }}>
         <div
           style={{
             textAlign: "left",
             marginBottom: 10,
             marginTop: 0,
-            width: "15%",
+            // width: "15%",
           }}>
-          <Title level={5}>Select Criteria</Title>
+          <Title level={4}>Select Criteria</Title>
         </div>
         <div
           style={{
             textAlign: "left",
             marginBottom: 20,
             marginTop: 24.5,
-            width: "80%",
+            // width: "80%",
             // marginLeft: 49,
           }}>
           <Form form={searchForm} onFinish={onFinish}>
@@ -318,11 +258,11 @@ const AdmissionReport = () => {
               <Select
                 onChange={onChangeDate}
                 style={{
-                  width: "22.9%",
+                  width: 220,
                   textAlign: "left",
                 }}
                 placeholder="Date">
-                <Option value="Today">Today</Option>
+                {/* <Option value="Today">Today</Option> */}
                 <Option value="This Week">This Week</Option>
                 <Option value="This Month">This Month</Option>
                 <Option value="Last 3 Months">Last 3 Months</Option>
@@ -335,7 +275,7 @@ const AdmissionReport = () => {
             <Form.Item noStyle name="gender" required>
               <Select
                 style={{
-                  width: "22.5%",
+                  width: 220,
                   textAlign: "left",
                   marginLeft: 15,
                 }}

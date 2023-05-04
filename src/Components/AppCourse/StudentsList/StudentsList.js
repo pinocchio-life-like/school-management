@@ -3,6 +3,7 @@ import {
   Form,
   Image,
   Input,
+  message,
   Popconfirm,
   Select,
   Space,
@@ -11,7 +12,7 @@ import {
 } from "antd";
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./StudentsList.css";
 const { Option } = Select;
@@ -233,16 +234,57 @@ const EditableCell = ({
 const StudentsList = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const [studentsList, setStudentsList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [xScroll, setXScroll] = useState("fixed");
   const [editingKey, setEditingKey] = useState("");
-  const [tableData, setTableData] = useState(originData);
+  const [messageApi, contextHolder] = message.useMessage();
+  const [tableData, setTableData] = useState([]);
   const isEditing = (record) => record.key === editingKey;
   const onSelectChange = (newSelectedRowKeys) => {
     console.log("selectedRowKeys changed: ", newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
+
+  //fetch students data
+  useEffect(() => {
+    const getStudents = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8080/admission/studentsList"
+        );
+        const responseData = await response.json();
+        if (responseData.code === 404) {
+          throw new Error("No students found");
+        }
+        setStudentsList(responseData.students);
+        const originalData = responseData.students;
+        const data = originalData.map((data) => {
+          return {
+            key: data.admissionNumber,
+            studentName: `${data.firstName} ${data.lastName}`,
+            studentId: data.admissionNumber,
+            grade: data.grade,
+            section: data.section,
+            dob: data.birthDate.slice(0, 10),
+            parentName: `${data.parentFirstName} ${data.parentLastName}`,
+            mobileNumber: data.parentPhoneNumber,
+            address: `${data.province}, ${data.street}, ${data.houseNumber}`,
+            studentImage:
+              "https://photos.psychologytoday.com/6f3c2e5c-deeb-4e31-ad7a-47d4df3a2c2e/2/320x400.jpeg",
+          };
+        });
+        setTableData(data);
+        console.log(responseData.students);
+      } catch (err) {
+        // setSearchIsLoading(false);
+        error("Check for your internet connection and try again");
+        return;
+      }
+    };
+    getStudents();
+  }, []);
   //Edit Student Start
   const edit = (record) => {
     form.setFieldsValue({
@@ -253,6 +295,13 @@ const StudentsList = () => {
       ...record,
     });
     setEditingKey(record.key);
+  };
+  //error message
+  const error = (message) => {
+    messageApi.open({
+      type: "error",
+      content: message,
+    });
   };
   //Save Edit Record
   const save = async (key) => {
@@ -309,10 +358,10 @@ const StudentsList = () => {
         return (
           <div>
             <Image
-              style={{ borderRadius: 5 }}
+              style={{ borderRadius: 10, padding: 5 }}
               alt="hello"
-              width={40}
-              height={40}
+              width={45}
+              height={45}
               src={record.studentImage}
             />
             <span style={{ marginLeft: 10 }}>{record.studentName}</span>
@@ -450,6 +499,7 @@ const StudentsList = () => {
   };
   return (
     <div>
+      {contextHolder}
       <div className="StudentsListConatiner">
         <div className="StudentListTitle">
           <Title
@@ -497,11 +547,11 @@ const StudentsList = () => {
             }}>
             <Button
               onClick={() => {
-                navigate("/studentAdmission");
+                navigate("/studentRegistration");
               }}
               type="primary"
               style={{ marginLeft: 5 }}>
-              Assign Teacher
+              Register New Student
             </Button>
           </div>
         </div>

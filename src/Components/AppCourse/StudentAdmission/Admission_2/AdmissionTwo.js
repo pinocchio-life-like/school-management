@@ -9,14 +9,22 @@ import {
   Modal,
   Row,
   Select,
+  Spin,
   Upload,
 } from "antd";
 import Title from "antd/es/typography/Title";
 import ImgCrop from "antd-img-crop";
 import { PlusOutlined } from "@ant-design/icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./AdmissionTwo.css";
 import Search from "antd/es/input/Search";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+dayjs.extend(customParseFormat);
+const globalDate = new Date();
+let globalToday = globalDate.getFullYear();
+globalToday = `${globalToday}`.slice(2);
+const dateFormat = "YYYY-MM-DD";
 const { Option } = Select;
 const { Panel } = Collapse;
 const getBase64 = (file) =>
@@ -28,6 +36,7 @@ const getBase64 = (file) =>
   });
 const AdmissionTwo = () => {
   const [form] = Form.useForm();
+  const [existingList, setExistingList] = useState([]);
   const [searchForm] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -35,8 +44,15 @@ const AdmissionTwo = () => {
   const [previewTitle, setPreviewTitle] = useState("");
   const [signupButtonClick, setSignupButtonClick] = useState("");
   const [isExists, setIsExists] = useState(false);
+  const [searchedStudent, setSearchedStudent] = useState([]);
   const [messageApi, contextHolder] = message.useMessage();
+  const [registerLoading, setRegisterLoading] = useState(false);
+  const [searchIsLoading, setSearchIsLoading] = useState(false);
+  const [generatedId, setGeneratedId] = useState("");
   const handleCancel = () => setPreviewOpen(false);
+  useEffect(() => {
+    //just to rerun
+  }, [isExists]);
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
@@ -47,7 +63,11 @@ const AdmissionTwo = () => {
       file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
     );
   };
-  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+  const handleChange = async ({ fileList: newFileList }) => {
+    // const ouputted = newFileList[0];
+    // console.log(ouputted);
+    setFileList(newFileList);
+  };
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -59,24 +79,135 @@ const AdmissionTwo = () => {
       </div>
     </div>
   );
-  const error = () => {
+  const error = (message) => {
     messageApi.open({
       type: "error",
-      content: "Record Does Not Exist!",
+      content: message,
     });
   };
-  const onFinish = (values) => {
-    console.log(values);
+  const success = (message) => {
+    messageApi.open({
+      type: "success",
+      content: message,
+    });
   };
-  const onExistingFinish = (values) => {
+  const onFinish = async (values) => {
+    setRegisterLoading(true);
     console.log(values);
+    // console.log(fileList[0]);
+    // if (!fileList[0].url && !fileList[0].preview) {
+    //   fileList[0].preview = await getBase64(fileList[0].originFileObj);
+    // }
+    // const imageUrl = fileList[0].preview;
+    // const formData = new FormData();
+    // formData.append("firstName", values.firstName);
+    // formData.append("lastName", values.lastName);
+    // formData.append("gender", values.gender);
+    // formData.append("religion", values.religion);
+    // formData.append("admissionNumber", values.admissionNumber);
+    // formData.append("grade", values.grade);
+    // formData.append("section", values.section);
+    // formData.append("rollNumber", values.rollNumber);
+    // formData.append("parentFirstName", values.parentFirstName);
+    // formData.append("parentLastName", values.parentLastName);
+    // formData.append("relation", values.relation);
+    // formData.append("phoneNumber", values.phoneNumber);
+    // formData.append("email", values.email);
+    // formData.append("province", values.province);
+    // formData.append("street", values.street);
+    // formData.append("houseNumber", values.houseNumber);
+    // formData.append("siblingGrade", values.siblingGrade);
+    // formData.append("siblingSection", values.siblingSection);
+    // formData.append("siblingName", values.siblingName);
+    // formData.append("studentProfile", imageUrl);
+    // console.log(fileList);
+
+    try {
+      const response = await fetch("http://localhost:8080/admission", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ admissionNumber: generatedId, ...values }),
+      });
+      const responseData = await response.json();
+      console.log(responseData);
+      setRegisterLoading(false);
+      if (responseData.code === 404) {
+        error("Record Already Exists");
+        form.resetFields();
+      } else {
+        success("Successfully Registered");
+        form.resetFields();
+      }
+      setGeneratedId("");
+    } catch (err) {
+      setRegisterLoading(false);
+      error("Check for your internet connection and try again");
+    }
   };
-  const onSearch = (value) => {
-    console.log(value);
-    if (value === "1234" || value === "abebe mola") {
+  const onExistingFinish = async (values) => {
+    setSearchIsLoading(true);
+    try {
+      const response = await fetch(
+        "http://localhost:8080/admission/updateStudent",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            admissionNumber: searchedStudent.admissionNumber,
+            ...values,
+          }),
+        }
+      );
+      const responseData = await response.json();
+      // console.log(responseData);
+      if (responseData.code === 404) {
+        // form.resetFields();
+        throw new Error("Couldn't update Student Data");
+      }
+      setSearchIsLoading(false);
+      success("Student Registered Successfully");
+    } catch (err) {
+      setSearchIsLoading(false);
+      error("Check for your internet connection and try again");
+    }
+    setGeneratedId("");
+  };
+  const onSearch = async (value) => {
+    setGeneratedId("");
+    searchForm.resetFields();
+    setSearchIsLoading(true);
+    try {
+      const response = await fetch(
+        "http://localhost:8080/admission/studentsList"
+      );
+      const responseData = await response.json();
+      if (responseData.code === 404) {
+        throw new Error("No students found");
+      }
+      let data = responseData.students;
+      setExistingList([...data]);
+      // console.log(responseData.students);
+    } catch (err) {
+      setSearchIsLoading(false);
+      error("Check for your internet connection and try again");
+      return;
+    }
+
+    const theStudent = existingList.find((student) => {
+      return student.admissionNumber === value;
+    });
+    if (theStudent) {
       setIsExists(true);
+      setSearchedStudent(theStudent);
+      setSearchIsLoading(false);
     } else {
-      error();
+      setIsExists(false);
+      setSearchIsLoading(false);
+      error("Student Does Not Exist");
     }
   };
 
@@ -87,18 +218,14 @@ const AdmissionTwo = () => {
           className={`admissionTwoContainer ${signupButtonClick}`}
           id="admissionTwoContainer">
           <div className="form-admissionTwoContainer sign-up-admissionTwoContainer">
-            <Form
-              form={searchForm}
-              onFinish={onExistingFinish}
-              className="admissionForm"
-              action="#">
+            <div>
               <Title
                 className="admissionHOne"
                 level={3}
                 style={{
                   textAlign: "left",
                   marginTop: 5,
-                  marginLeft: 15,
+                  marginLeft: 25,
                 }}>
                 Student Admission
               </Title>
@@ -109,742 +236,989 @@ const AdmissionTwo = () => {
                   marginBottom: 5,
                 }}>
                 <Search
-                  style={{ marginLeft: 15, marginRight: 5 }}
-                  placeholder="Enter Full Name Or ID to Search!"
+                  style={{ marginLeft: 25, marginRight: 12 }}
+                  placeholder="Enter Admission Number to Search!"
                   onSearch={onSearch}
-                  enterButton
+                  // enterButton
                 />
               </div>
-              <div className="social-admissionTwoContainer">
-                {isExists ? (
-                  <div>
-                    <>
-                      <div style={{ marginTop: -15, display: "flex" }}>
-                        <div style={{ width: "78%" }}>
-                          <>
-                            <div style={{ marginTop: "10px", display: "flex" }}>
-                              <Col style={{ width: "50%", marginLeft: "15px" }}>
+            </div>
+            <Form
+              form={searchForm}
+              onFinish={onExistingFinish}
+              className="admissionForm">
+              <Spin spinning={searchIsLoading}>
+                <div className="social-admissionTwoContainer">
+                  {isExists ? (
+                    <div>
+                      <>
+                        <div style={{ marginTop: -15, display: "flex" }}>
+                          <div style={{ width: "78%" }}>
+                            <>
+                              <div
+                                style={{ marginTop: "10px", display: "flex" }}>
+                                <Col
+                                  style={{ width: "50%", marginLeft: "15px" }}>
+                                  <div style={{ textAlign: "left" }}>
+                                    First Name
+                                  </div>
+                                  <Form.Item
+                                    initialValue={`${searchedStudent.firstName}`}
+                                    style={{ textAlign: "left" }}
+                                    name="firstNameExisiting">
+                                    <Input
+                                      style={{ width: "100%" }}
+                                      placeholder="First Name"
+                                      size="middle"
+                                    />
+                                  </Form.Item>
+                                </Col>
+                                <Col
+                                  style={{ width: "50%", marginLeft: "15px" }}>
+                                  <div style={{ textAlign: "left" }}>
+                                    Last Name
+                                  </div>
+                                  <Form.Item
+                                    initialValue={`${searchedStudent.lastName}`}
+                                    style={{ textAlign: "left" }}
+                                    name="lastNameExisiting"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "field is required",
+                                      },
+                                    ]}>
+                                    <Input
+                                      placeholder="Last Name"
+                                      size="middle"
+                                    />
+                                  </Form.Item>
+                                </Col>
+                              </div>
+                              <div style={{ display: "flex" }}>
+                                <Col
+                                  style={{ width: "50%", marginLeft: "15px" }}>
+                                  <div style={{ textAlign: "left" }}>
+                                    Gender
+                                  </div>
+                                  <Form.Item
+                                    initialValue={`${searchedStudent.gender}`}
+                                    style={{ textAlign: "left" }}
+                                    name="genderExisiting"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "field is required",
+                                      },
+                                    ]}>
+                                    <Select placeholder="Gender" size="middle">
+                                      <Option value="Male">Male</Option>
+                                      <Option value="Female">Female</Option>
+                                    </Select>
+                                  </Form.Item>
+                                </Col>
+                                <Col
+                                  style={{ width: "50%", marginLeft: "15px" }}>
+                                  <div style={{ textAlign: "left" }}>
+                                    Birth Date
+                                  </div>
+                                  <Form.Item
+                                    initialValue={dayjs(
+                                      `${searchedStudent.birthDate}`,
+                                      dateFormat
+                                    )}
+                                    style={{ textAlign: "left" }}
+                                    name="birthDateExisiting"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "field is required",
+                                      },
+                                    ]}>
+                                    <DatePicker
+                                      style={{ width: "100%" }}
+                                      placeholder="Birth Date"
+                                    />
+                                  </Form.Item>
+                                </Col>
+                              </div>
+                              <div style={{ display: "flex" }}>
+                                <Col
+                                  style={{ width: "50%", marginLeft: "15px" }}>
+                                  <div style={{ textAlign: "left" }}>
+                                    Religion
+                                  </div>
+                                  <Form.Item
+                                    initialValue={`${searchedStudent.religion}`}
+                                    style={{ textAlign: "left" }}
+                                    name="religionExisiting"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "field is required",
+                                      },
+                                    ]}>
+                                    <Input
+                                      placeholder="Religion"
+                                      size="middle"
+                                    />
+                                  </Form.Item>
+                                </Col>
+                                <Col
+                                  style={{ width: "50%", marginLeft: "15px" }}>
+                                  <div style={{ textAlign: "left" }}>Class</div>
+                                  <Form.Item
+                                    initialValue={`${searchedStudent.grade}`}
+                                    style={{ textAlign: "left" }}
+                                    name="gradeExisiting"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "field is required",
+                                      },
+                                    ]}>
+                                    <Select placeholder="Class" size="middle">
+                                      <Option value="Grade 1">Grade 1</Option>
+                                      <Option value="Grade 2">Grade 2</Option>
+                                      <Option value="Grade 3">Grade 3</Option>
+                                      <Option value="Grade 4">Grade 4</Option>
+                                      <Option value="Grade 5">Grade 5</Option>
+                                      <Option value="Grade 6">Grade 6</Option>
+                                      <Option value="Grade 7">Grade 7</Option>
+                                      <Option value="Grade 8">Grade 8</Option>
+                                    </Select>
+                                  </Form.Item>
+                                </Col>
+                              </div>
+                            </>
+                          </div>
+                          <div style={{ width: "22%", marginTop: 17 }}>
+                            <div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  marginLeft: 5,
+                                  height: 205,
+                                  width: 205,
+                                }}>
+                                <div className="setUploadSize setSizeClassName">
+                                  <ImgCrop rotate>
+                                    <Upload
+                                      action="http://localhost:8080/admission/upload"
+                                      // customRequest={({ file, onSuccess }) => {
+                                      //   setTimeout(() => {
+                                      //     onSuccess("ok");
+                                      //   }, 0);
+                                      // }}
+                                      listType="picture-card"
+                                      fileList={fileList}
+                                      onPreview={handlePreview}
+                                      onChange={handleChange}>
+                                      {fileList.length < 1 && "+ Upload"}
+                                    </Upload>
+                                  </ImgCrop>
+                                </div>
+                              </div>
+                              <Modal
+                                open={previewOpen}
+                                title={previewTitle}
+                                footer={null}
+                                onCancel={handleCancel}>
+                                <img
+                                  alt="example"
+                                  style={{
+                                    width: "100%",
+                                  }}
+                                  src={previewImage}
+                                />
+                              </Modal>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <Row style={{ marginTop: -5 }}>
+                            <Col style={{ width: "37.7%", marginLeft: "15px" }}>
+                              <div style={{ textAlign: "left" }}>
+                                Admission Number
+                              </div>
+                              <Form.Item
+                                style={{ textAlign: "left" }}
+                                rules={[
+                                  {
+                                    required: false,
+                                    message: "field is required",
+                                  },
+                                ]}>
+                                <div
+                                  style={{
+                                    border: "1px solid #AAE3E2",
+                                    height: "33px",
+                                    borderRadius: "6px",
+                                    textAlign: "left",
+                                    paddingTop: "4px",
+                                    paddingLeft: "10px",
+                                    marginTop: 0,
+                                  }}>
+                                  <strong>
+                                    {searchedStudent.admissionNumber}
+                                  </strong>
+                                </div>
+                              </Form.Item>
+                            </Col>
+                            <Col style={{ width: "37.7%", marginLeft: "15px" }}>
+                              <div style={{ textAlign: "left" }}>Section</div>
+                              <Form.Item
+                                initialValue={`${searchedStudent.section}`}
+                                style={{ textAlign: "left" }}
+                                name="sectionExisiting"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "field is required",
+                                  },
+                                ]}>
+                                <Select placeholder="Section" size="middle">
+                                  <Option value="A">A</Option>
+                                  <Option value="B">B</Option>
+                                  <Option value="C">C</Option>
+                                  <Option value="D">D</Option>
+                                </Select>
+                              </Form.Item>
+                            </Col>
+                            <Col style={{ width: "20.1%", marginLeft: "10px" }}>
+                              <div style={{ textAlign: "left" }}>
+                                Roll Number
+                              </div>
+                              <Form.Item
+                                initialValue={`${searchedStudent.rollNumber}`}
+                                style={{ textAlign: "left" }}
+                                name="rollNumberExisiting"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "field is required",
+                                  },
+                                ]}>
+                                <Input
+                                  placeholder="Roll Number"
+                                  size="middle"
+                                />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+                          <div>
+                            <Title
+                              level={4}
+                              style={{
+                                textAlign: "left",
+                                marginTop: -10,
+                                marginLeft: 15,
+                              }}>
+                              Parent Guardian information
+                            </Title>
+                          </div>
+
+                          <div>
+                            <Row style={{ marginTop: "0px" }}>
+                              <Col
+                                style={{ width: "31.5%", marginLeft: "15px" }}>
                                 <div style={{ textAlign: "left" }}>
                                   First Name
                                 </div>
                                 <Form.Item
-                                  initialValue="Abebe"
+                                  initialValue={`${searchedStudent.parentFirstName}`}
                                   style={{ textAlign: "left" }}
-                                  name="firstNameExisiting">
+                                  name="parentFirstNameExisiting">
                                   <Input
-                                    style={{ width: "100%" }}
                                     placeholder="First Name"
                                     size="middle"
                                   />
                                 </Form.Item>
                               </Col>
-                              <Col style={{ width: "50%", marginLeft: "15px" }}>
+                              <Col
+                                style={{ width: "31.5%", marginLeft: "15px" }}>
                                 <div style={{ textAlign: "left" }}>
                                   Last Name
                                 </div>
                                 <Form.Item
-                                  initialValue="Mola"
+                                  initialValue={`${searchedStudent.parentLastName}`}
                                   style={{ textAlign: "left" }}
-                                  name="lastNameExisiting"
-                                  rules={[]}>
+                                  name="parentLastNameExisiting"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "field is required",
+                                    },
+                                  ]}>
                                   <Input
                                     placeholder="Last Name"
                                     size="middle"
                                   />
                                 </Form.Item>
                               </Col>
-                            </div>
-                            <div style={{ display: "flex" }}>
-                              <Col style={{ width: "50%", marginLeft: "15px" }}>
-                                <div style={{ textAlign: "left" }}>Gender</div>
-                                <Form.Item
-                                  initialValue="Male"
-                                  // label="Courses"
-                                  style={{ textAlign: "left" }}
-                                  name="genderExisiting"
-                                  rules={[]}>
-                                  <Select placeholder="Gender" size="middle">
-                                    <Option value="male">Male</Option>
-                                    <Option value="female">Female</Option>
-                                  </Select>
-                                </Form.Item>
-                              </Col>
-                              <Col style={{ width: "50%", marginLeft: "15px" }}>
+                              <Col
+                                style={{ width: "31.9%", marginLeft: "15px" }}>
                                 <div style={{ textAlign: "left" }}>
-                                  Birth Date
+                                  Relation
                                 </div>
                                 <Form.Item
-                                  // initialValue="22-04-2000"
-                                  // label="Courses"
+                                  initialValue={`${searchedStudent.parentRelation}`}
                                   style={{ textAlign: "left" }}
-                                  name="birthDateExisiting"
-                                  rules={[]}>
-                                  <DatePicker
-                                    style={{ width: "100%" }}
-                                    placeholder="Birth Date"
-                                  />
+                                  name="parentRelationExisiting"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "field is required",
+                                    },
+                                  ]}>
+                                  <Input placeholder="Relation" size="middle" />
                                 </Form.Item>
                               </Col>
-                            </div>
-                            <div style={{ display: "flex" }}>
-                              <Col style={{ width: "50%", marginLeft: "15px" }}>
+                            </Row>
+                            <Row style={{ marginTop: "0px" }}>
+                              <Col
+                                style={{ width: "31.5%", marginLeft: "15px" }}>
                                 <div style={{ textAlign: "left" }}>
-                                  Religion
+                                  Phone Number
                                 </div>
                                 <Form.Item
-                                  initialValue="Muslim"
-                                  // label="Courses"
+                                  initialValue={`${searchedStudent.parentPhoneNumber}`}
                                   style={{ textAlign: "left" }}
-                                  name="religionExisiting"
-                                  rules={[]}>
-                                  <Input placeholder="Religion" size="middle" />
-                                </Form.Item>
-                              </Col>
-                              <Col style={{ width: "50%", marginLeft: "15px" }}>
-                                <div style={{ textAlign: "left" }}>
-                                  Admission Number
-                                </div>
-                                <Form.Item
-                                  initialValue="1234"
-                                  // label="Courses"
-                                  style={{ textAlign: "left" }}
-                                  name="admissionNumberExisiting"
-                                  rules={[]}>
+                                  name="parentPhoneNumberExisiting"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "field is required",
+                                    },
+                                  ]}>
                                   <Input
-                                    placeholder="Admission Number"
+                                    style={{ width: "100%" }}
+                                    placeholder="Phone Number"
                                     size="middle"
                                   />
                                 </Form.Item>
                               </Col>
-                            </div>
-                          </>
-                        </div>
-                        <div style={{ width: "22%", marginTop: 17 }}>
-                          <div>
-                            <div
-                              style={{
-                                display: "flex",
-                                marginLeft: 5,
-                                height: 205,
-                                width: 205,
-                              }}>
-                              <div className="setUploadSize setSizeClassName">
-                                <ImgCrop rotate>
-                                  <Upload
-                                    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                                    listType="picture-card"
-                                    fileList={fileList}
-                                    onPreview={handlePreview}
-                                    onChange={handleChange}>
-                                    {fileList.length < 1 && "+ Upload"}
-                                  </Upload>
-                                </ImgCrop>
-                              </div>
-                            </div>
-                            <Modal
-                              open={previewOpen}
-                              title={previewTitle}
-                              footer={null}
-                              onCancel={handleCancel}>
-                              <img
-                                alt="example"
-                                style={{
-                                  width: "100%",
-                                }}
-                                src={previewImage}
-                              />
-                            </Modal>
+                              <Col
+                                style={{ width: "31.5%", marginLeft: "15px" }}>
+                                <div style={{ textAlign: "left" }}>Email</div>
+                                <Form.Item
+                                  initialValue={`${searchedStudent.email}`}
+                                  style={{ textAlign: "left" }}
+                                  name="emailExisiting"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "field is required",
+                                    },
+                                  ]}>
+                                  <Input
+                                    type="email"
+                                    placeholder="default size"
+                                    size="middle"
+                                  />
+                                </Form.Item>
+                              </Col>
+                              <Col
+                                style={{ width: "31.9%", marginLeft: "15px" }}>
+                                <div style={{ textAlign: "left" }}>
+                                  Province
+                                </div>
+                                <Form.Item
+                                  initialValue={`${searchedStudent.province}`}
+                                  style={{ textAlign: "left" }}
+                                  name="provinceExisiting"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "field is required",
+                                    },
+                                  ]}>
+                                  <Input placeholder="Province" size="middle" />
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                            <Row style={{ marginTop: "0px" }}>
+                              <Col
+                                style={{ width: "31.5%", marginLeft: "15px" }}>
+                                <div style={{ textAlign: "left" }}>Street</div>
+                                <Form.Item
+                                  initialValue={`${searchedStudent.street}`}
+                                  style={{ textAlign: "left" }}
+                                  name="streetExisiting"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "field is required",
+                                    },
+                                  ]}>
+                                  <Input placeholder="street" size="middle" />
+                                </Form.Item>
+                              </Col>
+                              <Col
+                                style={{ width: "31.5%", marginLeft: "15px" }}>
+                                <div style={{ textAlign: "left" }}>
+                                  House Number
+                                </div>
+                                <Form.Item
+                                  initialValue={`${searchedStudent.houseNumber}`}
+                                  style={{ textAlign: "left" }}
+                                  name="houseNumberExisiting"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "field is required",
+                                    },
+                                  ]}>
+                                  <Input
+                                    placeholder="default size"
+                                    size="middle"
+                                  />
+                                </Form.Item>
+                              </Col>
+                              <Col
+                                style={{ width: "30.5%", marginLeft: "15px" }}>
+                                {/* <div style={{ textAlign: "left" }}>Province</div> */}
+                                <Form.Item shouldUpdate>
+                                  {() => (
+                                    <Button
+                                      style={{ width: "100%", marginTop: 22 }}
+                                      type="primary"
+                                      htmlType="submit">
+                                      Save Student
+                                    </Button>
+                                  )}
+                                </Form.Item>
+                              </Col>
+                            </Row>
                           </div>
                         </div>
-                      </div>
-                      <div>
-                        <Row style={{ marginTop: -5 }}>
-                          <Col style={{ width: "37.7%", marginLeft: "15px" }}>
-                            <div style={{ textAlign: "left" }}>Class</div>
-                            <Form.Item
-                              initialValue="Grade 9"
-                              // label="Courses"
-                              style={{ textAlign: "left" }}
-                              name="classExisiting"
-                              rules={[]}>
-                              <Select placeholder="Class" size="middle">
-                                <Option value="Grade 1">Grade 1</Option>
-                                <Option value="Grade 2">Grade 2</Option>
-                                <Option value="Grade 3">Grade 3</Option>
-                                <Option value="Grade 4">Grade 4</Option>
-                                <Option value="Grade 5">Grade 5</Option>
-                                <Option value="Grade 6">Grade 6</Option>
-                                <Option value="Grade 7">Grade 7</Option>
-                              </Select>
-                            </Form.Item>
-                          </Col>
-                          <Col style={{ width: "37.7%", marginLeft: "15px" }}>
-                            <div style={{ textAlign: "left" }}>Section</div>
-                            <Form.Item
-                              initialValue="B"
-                              // label="Courses"
-                              style={{ textAlign: "left" }}
-                              name="sectionExisiting"
-                              rules={[]}>
-                              <Select placeholder="Section" size="middle">
-                                <Option value="A">A</Option>
-                                <Option value="B">B</Option>
-                                <Option value="C">C</Option>
-                                <Option value="D">D</Option>
-                              </Select>
-                            </Form.Item>
-                          </Col>
-                          <Col style={{ width: "20.1%", marginLeft: "10px" }}>
-                            <div style={{ textAlign: "left" }}>Roll Number</div>
-                            <Form.Item
-                              initialValue="0346"
-                              // label="Courses"
-                              style={{ textAlign: "left" }}
-                              name="rollNumberExisiting"
-                              rules={[]}>
-                              <Input placeholder="Roll Number" size="middle" />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                        <div>
-                          <Title
-                            level={4}
-                            style={{
-                              textAlign: "left",
-                              marginTop: -10,
-                              marginLeft: 15,
-                            }}>
-                            Parent Guardian information
-                          </Title>
-                        </div>
+                      </>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  {contextHolder}
+                </div>
+              </Spin>
+            </Form>
+          </div>
+          <div className="form-admissionTwoContainer sign-in-admissionTwoContainer">
+            <Form form={form} onFinish={onFinish} className="admissionForm">
+              <Spin spinning={registerLoading}>
+                <div>
+                  <div style={{ display: "flex" }}>
+                    <div>
+                      <Title
+                        level={3}
+                        style={{
+                          textAlign: "left",
+                          marginTop: 5,
+                          marginLeft: 15,
+                        }}>
+                        Student Admission
+                      </Title>
+                    </div>
+                    {/* <div style={{ textAlign: "right", marginLeft: 639 }}>
+                      <Form.Item shouldUpdate>
+                        {() => (
+                          <Button
+                            style={{ marginTop: 5 }}
+                            type="primary"
+                            htmlType="submit">
+                            Save Student
+                          </Button>
+                        )}
+                      </Form.Item>
+                    </div> */}
+                  </div>
 
+                  <>
+                    <div style={{ display: "flex" }}>
+                      <div style={{ width: "22%", marginTop: 17 }}>
                         <div>
-                          <Row style={{ marginTop: "0px" }}>
-                            <Col style={{ width: "31.5%", marginLeft: "15px" }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              marginLeft: 15,
+                              height: 205,
+                              width: 205,
+                            }}>
+                            <div className="setUploadSize setSizeClassName">
+                              <ImgCrop rotate>
+                                <Upload
+                                  customRequest={({ file, onSuccess }) => {
+                                    setTimeout(() => {
+                                      onSuccess("ok");
+                                    }, 0);
+                                  }}
+                                  listType="picture-card"
+                                  fileList={fileList}
+                                  onPreview={handlePreview}
+                                  onChange={handleChange}>
+                                  {fileList.length < 1 && "+ Upload"}
+                                </Upload>
+                              </ImgCrop>
+                            </div>
+                          </div>
+                          <Modal
+                            open={previewOpen}
+                            title={previewTitle}
+                            footer={null}
+                            onCancel={handleCancel}>
+                            <img
+                              alt="example"
+                              style={{
+                                width: "100%",
+                              }}
+                              src={previewImage}
+                            />
+                          </Modal>
+                        </div>
+                      </div>
+                      <div style={{ width: "78%" }}>
+                        <>
+                          <div style={{ marginTop: "10px", display: "flex" }}>
+                            <Col style={{ width: "50%", marginLeft: "15px" }}>
                               <div style={{ textAlign: "left" }}>
                                 First Name
                               </div>
                               <Form.Item
-                                initialValue="Mola"
-                                // label="Courses"
                                 style={{ textAlign: "left" }}
-                                name="parentFirstNameExisiting">
-                                <Input placeholder="First Name" size="middle" />
+                                name="firstName"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "field is required",
+                                  },
+                                ]}>
+                                <Input
+                                  style={{ width: "100%" }}
+                                  placeholder="First Name"
+                                  size="middle"
+                                />
                               </Form.Item>
                             </Col>
-                            <Col style={{ width: "31.5%", marginLeft: "15px" }}>
+                            <Col style={{ width: "50%", marginLeft: "15px" }}>
                               <div style={{ textAlign: "left" }}>Last Name</div>
                               <Form.Item
-                                // label="Courses"
-                                initialValue="Shafi"
                                 style={{ textAlign: "left" }}
-                                name="parentLastNameExisiting"
-                                rules={[]}>
+                                name="lastName"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "field is required",
+                                  },
+                                ]}>
                                 <Input placeholder="Last Name" size="middle" />
                               </Form.Item>
                             </Col>
-                            <Col style={{ width: "31.9%", marginLeft: "15px" }}>
-                              <div style={{ textAlign: "left" }}>Relation</div>
-                              <Form.Item
-                                initialValue="Father"
-                                // label="Courses"
-                                style={{ textAlign: "left" }}
-                                name="parentRelationExisiting"
-                                rules={[]}>
-                                <Input placeholder="Relation" size="middle" />
-                              </Form.Item>
-                            </Col>
-                          </Row>
-                          <Row style={{ marginTop: "0px" }}>
-                            <Col style={{ width: "31.5%", marginLeft: "15px" }}>
-                              <div style={{ textAlign: "left" }}>
-                                Phone Number
-                              </div>
-                              <Form.Item
-                                initialValue="+25965778789"
-                                // label="Courses"
-                                style={{ textAlign: "left" }}
-                                name="parentPhoneNumberExisiting"
-                                rules={[]}>
-                                <Input
-                                  style={{ width: "100%" }}
-                                  placeholder="Phone Number"
-                                  size="middle"
-                                />
-                              </Form.Item>
-                            </Col>
-                            <Col style={{ width: "31.5%", marginLeft: "15px" }}>
-                              <div style={{ textAlign: "left" }}>Email</div>
-                              <Form.Item
-                                initialValue="icbr19fl@gmail.com"
-                                // label="Courses"
-                                style={{ textAlign: "left" }}
-                                name="emailExisiting"
-                                rules={[]}>
-                                <Input
-                                  type="email"
-                                  placeholder="default size"
-                                  size="middle"
-                                />
-                              </Form.Item>
-                            </Col>
-                            <Col style={{ width: "31.9%", marginLeft: "15px" }}>
-                              <div style={{ textAlign: "left" }}>Province</div>
-                              <Form.Item
-                                initialValue="Yeka"
-                                // label="Courses"
-                                style={{ textAlign: "left" }}
-                                name="provinceExisiting"
-                                rules={[]}>
-                                <Input placeholder="Province" size="middle" />
-                              </Form.Item>
-                            </Col>
-                          </Row>
-                          <Row style={{ marginTop: "0px" }}>
-                            <Col style={{ width: "31.5%", marginLeft: "15px" }}>
-                              <div style={{ textAlign: "left" }}>Street</div>
-                              <Form.Item
-                                initialValue="Abado"
-                                // label="Courses"
-                                style={{ textAlign: "left" }}
-                                name="streetExisiting"
-                                rules={[]}>
-                                <Input placeholder="street" size="middle" />
-                              </Form.Item>
-                            </Col>
-                            <Col style={{ width: "31.5%", marginLeft: "15px" }}>
-                              <div style={{ textAlign: "left" }}>
-                                House Number
-                              </div>
-                              <Form.Item
-                                initialValue="234/23"
-                                // label="Courses"
-                                style={{ textAlign: "left" }}
-                                name="houseNumberExisiting"
-                                rules={[]}>
-                                <Input
-                                  placeholder="default size"
-                                  size="middle"
-                                />
-                              </Form.Item>
-                            </Col>
-                            <Col style={{ width: "30.5%", marginLeft: "15px" }}>
-                              {/* <div style={{ textAlign: "left" }}>Province</div> */}
-                              <Form.Item shouldUpdate>
-                                {() => (
-                                  <Button
-                                    style={{ width: "100%", marginTop: 22 }}
-                                    type="primary"
-                                    htmlType="submit">
-                                    Save Student
-                                  </Button>
-                                )}
-                              </Form.Item>
-                            </Col>
-                          </Row>
-                        </div>
-                      </div>
-                    </>
-                  </div>
-                ) : (
-                  ""
-                )}
-                {contextHolder}
-              </div>
-            </Form>
-          </div>
-          <div className="form-admissionTwoContainer sign-in-admissionTwoContainer">
-            <Form
-              form={form}
-              onFinish={onFinish}
-              className="admissionForm"
-              action="#">
-              <div>
-                <div style={{ display: "flex" }}>
-                  <div>
-                    <Title
-                      level={3}
-                      style={{
-                        textAlign: "left",
-                        marginTop: 5,
-                        marginLeft: 15,
-                      }}>
-                      Student Admission
-                    </Title>
-                  </div>
-                  <div style={{ textAlign: "right", marginLeft: 639 }}>
-                    <Form.Item shouldUpdate>
-                      {() => (
-                        <Button
-                          style={{ marginTop: 5 }}
-                          type="primary"
-                          htmlType="submit">
-                          Save Student
-                        </Button>
-                      )}
-                    </Form.Item>
-                  </div>
-                </div>
-
-                <>
-                  <div style={{ display: "flex" }}>
-                    <div style={{ width: "22%", marginTop: 17 }}>
-                      <div>
-                        <div
-                          style={{
-                            display: "flex",
-                            marginLeft: 15,
-                            height: 205,
-                            width: 205,
-                          }}>
-                          <div className="setUploadSize setSizeClassName">
-                            <ImgCrop rotate>
-                              <Upload
-                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                                listType="picture-card"
-                                fileList={fileList}
-                                onPreview={handlePreview}
-                                onChange={handleChange}>
-                                {fileList.length < 1 && "+ Upload"}
-                              </Upload>
-                            </ImgCrop>
                           </div>
-                        </div>
-                        <Modal
-                          open={previewOpen}
-                          title={previewTitle}
-                          footer={null}
-                          onCancel={handleCancel}>
-                          <img
-                            alt="example"
-                            style={{
-                              width: "100%",
-                            }}
-                            src={previewImage}
-                          />
-                        </Modal>
+                          <div style={{ display: "flex" }}>
+                            <Col style={{ width: "50%", marginLeft: "15px" }}>
+                              <div style={{ textAlign: "left" }}>Gender</div>
+                              <Form.Item
+                                style={{ textAlign: "left" }}
+                                name="gender"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "field is required",
+                                  },
+                                ]}>
+                                <Select placeholder="Gender" size="middle">
+                                  <Option value="Male">Male</Option>
+                                  <Option value="Female">Female</Option>
+                                </Select>
+                              </Form.Item>
+                            </Col>
+                            <Col style={{ width: "50%", marginLeft: "15px" }}>
+                              <div style={{ textAlign: "left" }}>
+                                Birth Date
+                              </div>
+                              <Form.Item
+                                style={{ textAlign: "left" }}
+                                name="birthDate"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "field is required",
+                                  },
+                                ]}>
+                                <DatePicker
+                                  style={{ width: "100%" }}
+                                  placeholder="Birth Date"
+                                />
+                              </Form.Item>
+                            </Col>
+                          </div>
+                          <div style={{ display: "flex" }}>
+                            <Col style={{ width: "50%", marginLeft: "15px" }}>
+                              <div style={{ textAlign: "left" }}>Religion</div>
+                              <Form.Item
+                                style={{ textAlign: "left" }}
+                                name="religion"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "field is required",
+                                  },
+                                ]}>
+                                <Input placeholder="Religion" size="middle" />
+                              </Form.Item>
+                            </Col>
+                            <Col style={{ width: "50%", marginLeft: "15px" }}>
+                              <div style={{ textAlign: "left" }}>Class</div>
+                              <Form.Item
+                                style={{ textAlign: "left" }}
+                                name="grade"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "field is required",
+                                  },
+                                ]}>
+                                <Select
+                                  onChange={(value) => {
+                                    let rand = Math.random() * 1000;
+                                    rand = `${Math.floor(rand)}`;
+                                    if (rand.length === 1) {
+                                      rand = `00${rand}`;
+                                    }
+                                    if (rand.length === 2) {
+                                      rand = `0${rand}`;
+                                    }
+                                    if (value === "Grade 1") {
+                                      rand = `1ST${rand}${globalToday}`;
+                                    } else if (value === "Grade 2") {
+                                      rand = `2ND${rand}${globalToday}`;
+                                    } else if (value === "Grade 3") {
+                                      rand = `3RD${rand}${globalToday}`;
+                                    } else {
+                                      rand = `${value.slice(
+                                        -1
+                                      )}TH${rand}${globalToday}`;
+                                    }
+                                    setGeneratedId(rand);
+                                  }}
+                                  placeholder="Grade"
+                                  size="middle">
+                                  <Option value="Grade 1">Grade 1</Option>
+                                  <Option value="Grade 2">Grade 2</Option>
+                                  <Option value="Grade 3">Grade 3</Option>
+                                  <Option value="Grade 4">Grade 4</Option>
+                                  <Option value="Grade 5">Grade 5</Option>
+                                  <Option value="Grade 6">Grade 6</Option>
+                                  <Option value="Grade 7">Grade 7</Option>
+                                  <Option value="Grade 8">Grade 8</Option>
+                                </Select>
+                              </Form.Item>
+                            </Col>
+                          </div>
+                        </>
                       </div>
                     </div>
-                    <div style={{ width: "78%" }}>
-                      <>
-                        <div style={{ marginTop: "10px", display: "flex" }}>
-                          <Col style={{ width: "50%", marginLeft: "15px" }}>
+                    <div>
+                      <Row style={{ marginTop: -5 }}>
+                        <Col style={{ width: "21.2%", marginLeft: "15px" }}>
+                          <div style={{ textAlign: "left" }}>
+                            Admission Number
+                          </div>
+                          <Form.Item
+                            style={{ textAlign: "left" }}
+                            rules={[
+                              {
+                                required: false,
+                                message: "field is required",
+                              },
+                            ]}>
+                            <div
+                              style={{
+                                border: "1px solid #AAE3E2",
+                                height: "33px",
+                                borderRadius: "6px",
+                                textAlign: "left",
+                                paddingTop: "4px",
+                                paddingLeft: "10px",
+                                marginTop: 0,
+                              }}>
+                              <strong>{generatedId}</strong>
+                            </div>
+                          </Form.Item>
+                        </Col>
+                        <Col style={{ width: "37.5%", marginLeft: "8px" }}>
+                          <div style={{ textAlign: "left" }}>Section</div>
+                          <Form.Item
+                            style={{ textAlign: "left" }}
+                            name="section"
+                            rules={[
+                              {
+                                required: true,
+                                message: "field is required",
+                              },
+                            ]}>
+                            <Select placeholder="Section" size="middle">
+                              <Option value="A">A</Option>
+                              <Option value="B">B</Option>
+                              <Option value="C">C</Option>
+                              <Option value="D">D</Option>
+                            </Select>
+                          </Form.Item>
+                        </Col>
+                        <Col style={{ width: "37.3%", marginLeft: "15px" }}>
+                          <div style={{ textAlign: "left" }}>Roll Number</div>
+                          <Form.Item
+                            style={{ textAlign: "left" }}
+                            name="rollNumber"
+                            rules={[
+                              {
+                                required: true,
+                                message: "field is required",
+                              },
+                            ]}>
+                            <Input placeholder="Roll Number" size="middle" />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                      <div>
+                        <Title
+                          level={4}
+                          style={{
+                            textAlign: "left",
+                            marginTop: 0,
+                            marginLeft: 15,
+                          }}>
+                          Parent Guardian information
+                        </Title>
+                      </div>
+
+                      <div>
+                        <Row style={{ marginTop: "0px" }}>
+                          <Col style={{ width: "30.5%", marginLeft: "15px" }}>
                             <div style={{ textAlign: "left" }}>First Name</div>
                             <Form.Item
                               style={{ textAlign: "left" }}
-                              name="firstName">
-                              <Input
-                                style={{ width: "100%" }}
-                                placeholder="First Name"
-                                size="middle"
-                              />
+                              name="parentFirstName"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "field is required",
+                                },
+                              ]}>
+                              <Input placeholder="First Name" size="middle" />
                             </Form.Item>
                           </Col>
-                          <Col style={{ width: "50%", marginLeft: "15px" }}>
+                          <Col style={{ width: "30.5%", marginLeft: "15px" }}>
                             <div style={{ textAlign: "left" }}>Last Name</div>
                             <Form.Item
                               style={{ textAlign: "left" }}
-                              name="lastName"
-                              rules={[]}>
+                              name="parentLastName"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "field is required",
+                                },
+                              ]}>
                               <Input placeholder="Last Name" size="middle" />
                             </Form.Item>
                           </Col>
-                        </div>
-                        <div style={{ display: "flex" }}>
-                          <Col style={{ width: "50%", marginLeft: "15px" }}>
-                            <div style={{ textAlign: "left" }}>Gender</div>
+                          <Col style={{ width: "30.5%", marginLeft: "15px" }}>
+                            <div style={{ textAlign: "left" }}>Relation</div>
                             <Form.Item
-                              // label="Courses"
                               style={{ textAlign: "left" }}
-                              name="gender"
-                              rules={[]}>
-                              <Select placeholder="Gender" size="middle">
-                                <Option value="male">Male</Option>
-                                <Option value="female">Female</Option>
-                              </Select>
+                              name="parentRelation"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "field is required",
+                                },
+                              ]}>
+                              <Input placeholder="Relation" size="middle" />
                             </Form.Item>
                           </Col>
-                          <Col style={{ width: "50%", marginLeft: "15px" }}>
-                            <div style={{ textAlign: "left" }}>Birth Date</div>
-                            <Form.Item
-                              // label="Courses"
-                              style={{ textAlign: "left" }}
-                              name="birthDate"
-                              rules={[]}>
-                              <DatePicker
-                                style={{ width: "100%" }}
-                                placeholder="Birth Date"
-                              />
-                            </Form.Item>
-                          </Col>
-                        </div>
-                        <div style={{ display: "flex" }}>
-                          <Col style={{ width: "50%", marginLeft: "15px" }}>
-                            <div style={{ textAlign: "left" }}>Religion</div>
-                            <Form.Item
-                              // label="Courses"
-                              style={{ textAlign: "left" }}
-                              name="religion"
-                              rules={[]}>
-                              <Input placeholder="Religion" size="middle" />
-                            </Form.Item>
-                          </Col>
-                          <Col style={{ width: "50%", marginLeft: "15px" }}>
+                        </Row>
+                        <Row style={{ marginTop: "0px" }}>
+                          <Col style={{ width: "30.5%", marginLeft: "15px" }}>
                             <div style={{ textAlign: "left" }}>
-                              Admission Number
+                              Phone Number
                             </div>
                             <Form.Item
-                              // label="Courses"
                               style={{ textAlign: "left" }}
-                              name="admissionNumber"
-                              rules={[]}>
+                              name="parentPhoneNumber"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "field is required",
+                                },
+                              ]}>
                               <Input
-                                placeholder="Admission Number"
+                                style={{ width: "100%" }}
+                                placeholder="Phone Number"
                                 size="middle"
                               />
                             </Form.Item>
                           </Col>
-                        </div>
-                      </>
+                          <Col style={{ width: "30.5%", marginLeft: "15px" }}>
+                            <div style={{ textAlign: "left" }}>Email</div>
+                            <Form.Item
+                              style={{ textAlign: "left" }}
+                              name="email"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "field is required",
+                                },
+                              ]}>
+                              <Input
+                                type="email"
+                                placeholder="default size"
+                                size="middle"
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col style={{ width: "30.5%", marginLeft: "15px" }}>
+                            <div style={{ textAlign: "left" }}>Province</div>
+                            <Form.Item
+                              style={{ textAlign: "left" }}
+                              name="province"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "field is required",
+                                },
+                              ]}>
+                              <Input placeholder="Province" size="middle" />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                        <Row style={{ marginTop: "0px" }}>
+                          <Col style={{ width: "30.5%", marginLeft: "15px" }}>
+                            <div style={{ textAlign: "left" }}>Street</div>
+                            <Form.Item
+                              style={{ textAlign: "left" }}
+                              name="street"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "field is required",
+                                },
+                              ]}>
+                              <Input placeholder="street" size="middle" />
+                            </Form.Item>
+                          </Col>
+                          <Col style={{ width: "30.5%", marginLeft: "15px" }}>
+                            <div style={{ textAlign: "left" }}>
+                              House Number
+                            </div>
+                            <Form.Item
+                              style={{ textAlign: "left" }}
+                              name="houseNumber"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "field is required",
+                                },
+                              ]}>
+                              <Input placeholder="default size" size="middle" />
+                            </Form.Item>
+                          </Col>
+                          <Col style={{ width: "30.5%", marginLeft: "15px" }}>
+                            {/* <div style={{ textAlign: "left" }}>Province</div> */}
+                            <Form.Item shouldUpdate>
+                              {() => (
+                                <Button
+                                  style={{ width: "100%", marginTop: 22 }}
+                                  type="primary"
+                                  htmlType="submit">
+                                  Save Student
+                                </Button>
+                              )}
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <Row style={{ marginTop: -5 }}>
-                      <Col style={{ width: "21.2%", marginLeft: "15px" }}>
-                        <div style={{ textAlign: "left" }}>Class</div>
-                        <Form.Item
-                          // label="Courses"
-                          style={{ textAlign: "left" }}
-                          name="class"
-                          rules={[]}>
-                          <Select placeholder="Class" size="middle">
-                            <Option value="Grade 1">Grade 1</Option>
-                            <Option value="Grade 2">Grade 2</Option>
-                            <Option value="Grade 3">Grade 3</Option>
-                            <Option value="Grade 4">Grade 4</Option>
-                            <Option value="Grade 5">Grade 5</Option>
-                            <Option value="Grade 6">Grade 6</Option>
-                            <Option value="Grade 7">Grade 7</Option>
-                          </Select>
-                        </Form.Item>
-                      </Col>
-                      <Col style={{ width: "37.5%", marginLeft: "8px" }}>
-                        <div style={{ textAlign: "left" }}>Section</div>
-                        <Form.Item
-                          // label="Courses"
-                          style={{ textAlign: "left" }}
-                          name="section"
-                          rules={[]}>
-                          <Select placeholder="Section" size="middle">
-                            <Option value="A">A</Option>
-                            <Option value="B">B</Option>
-                            <Option value="C">C</Option>
-                            <Option value="D">D</Option>
-                          </Select>
-                        </Form.Item>
-                      </Col>
-                      <Col style={{ width: "37.3%", marginLeft: "15px" }}>
-                        <div style={{ textAlign: "left" }}>Roll Number</div>
-                        <Form.Item
-                          // label="Courses"
-                          style={{ textAlign: "left" }}
-                          name="rollNumber"
-                          rules={[]}>
-                          <Input placeholder="Roll Number" size="middle" />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <div>
-                      <Title
-                        level={4}
-                        style={{
-                          textAlign: "left",
-                          marginTop: 0,
-                          marginLeft: 15,
+                    {/* <div style={{ marginTop: 9 }}>
+                      <Collapse
+                        //   style={{ marginBottom: -30 }}
+                        expandIcon={({ isActive }) => (
+                          <PlusOutlined rotate={isActive ? 90 : 0} />
+                        )}
+                        bordered={false}
+                        defaultActiveKey={["1"]}
+                        onChange={(key) => {
+                          console.log(key);
                         }}>
-                        Parent Guardian information
-                      </Title>
-                    </div>
-
-                    <div>
-                      <Row style={{ marginTop: "0px" }}>
-                        <Col style={{ width: "30.5%", marginLeft: "15px" }}>
-                          <div style={{ textAlign: "left" }}>First Name</div>
-                          <Form.Item
-                            // label="Courses"
-                            style={{ textAlign: "left" }}
-                            name="parentFirstName">
-                            <Input placeholder="First Name" size="middle" />
-                          </Form.Item>
-                        </Col>
-                        <Col style={{ width: "30.5%", marginLeft: "15px" }}>
-                          <div style={{ textAlign: "left" }}>Last Name</div>
-                          <Form.Item
-                            // label="Courses"
-                            style={{ textAlign: "left" }}
-                            name="parentLastName"
-                            rules={[]}>
-                            <Input placeholder="Last Name" size="middle" />
-                          </Form.Item>
-                        </Col>
-                        <Col style={{ width: "30.5%", marginLeft: "15px" }}>
-                          <div style={{ textAlign: "left" }}>Relation</div>
-                          <Form.Item
-                            // label="Courses"
-                            style={{ textAlign: "left" }}
-                            name="parentRelation"
-                            rules={[]}>
-                            <Input placeholder="Relation" size="middle" />
-                          </Form.Item>
-                        </Col>
-                      </Row>
-                      <Row style={{ marginTop: "0px" }}>
-                        <Col style={{ width: "30.5%", marginLeft: "15px" }}>
-                          <div style={{ textAlign: "left" }}>Phone Number</div>
-                          <Form.Item
-                            // label="Courses"
-                            style={{ textAlign: "left" }}
-                            name="parentPhoneNumber"
-                            rules={[]}>
-                            <Input
-                              style={{ width: "100%" }}
-                              placeholder="Phone Number"
-                              size="middle"
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col style={{ width: "30.5%", marginLeft: "15px" }}>
-                          <div style={{ textAlign: "left" }}>Email</div>
-                          <Form.Item
-                            // label="Courses"
-                            style={{ textAlign: "left" }}
-                            name="email"
-                            rules={[]}>
-                            <Input
-                              type="email"
-                              placeholder="default size"
-                              size="middle"
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col style={{ width: "30.5%", marginLeft: "15px" }}>
-                          <div style={{ textAlign: "left" }}>Province</div>
-                          <Form.Item
-                            // label="Courses"
-                            style={{ textAlign: "left" }}
-                            name="province"
-                            rules={[]}>
-                            <Input placeholder="Province" size="middle" />
-                          </Form.Item>
-                        </Col>
-                      </Row>
-                      <Row style={{ marginTop: "0px" }}>
-                        <Col style={{ width: "30.5%", marginLeft: "15px" }}>
-                          <div style={{ textAlign: "left" }}>Street</div>
-                          <Form.Item
-                            // label="Courses"
-                            style={{ textAlign: "left" }}
-                            name="street"
-                            rules={[]}>
-                            <Input placeholder="street" size="middle" />
-                          </Form.Item>
-                        </Col>
-                        <Col style={{ width: "30.5%", marginLeft: "15px" }}>
-                          <div style={{ textAlign: "left" }}>House Number</div>
-                          <Form.Item
-                            // label="Courses"
-                            style={{ textAlign: "left" }}
-                            name="houseNumber"
-                            rules={[]}>
-                            <Input placeholder="default size" size="middle" />
-                          </Form.Item>
-                        </Col>
-                        <Col style={{ width: "30.5%", marginLeft: "15px" }}>
-                          {/* <div style={{ textAlign: "left" }}>Province</div> */}
-                        </Col>
-                      </Row>
-                    </div>
-                  </div>
-                  <div style={{ marginTop: 9 }}>
-                    <Collapse
-                      //   style={{ marginBottom: -30 }}
-                      expandIcon={({ isActive }) => (
-                        <PlusOutlined rotate={isActive ? 90 : 0} />
-                      )}
-                      bordered={false}
-                      defaultActiveKey={["1"]}
-                      onChange={(key) => {
-                        console.log(key);
-                      }}>
-                      <Panel
-                        style={{ textAlign: "left" }}
-                        header="Add Sibling"
-                        key="1">
-                        <Col style={{ width: "100%" }}>
-                          <div
-                            style={{
-                              textAlign: "left",
-                              margin: 0,
-                            }}>
-                            Class
-                          </div>
-                          <Row>
-                            <Form.Item
-                              name="siblingClass"
-                              style={{ width: "100%" }}>
-                              <Select
-                                style={{ textAlign: "left" }}
-                                placeholder="Select Class">
-                                <Option value="Grade 1">Grade 1</Option>
-                                <Option value="Grade 2">Grade 2</Option>
-                                <Option value="Grade 3">Grade 3</Option>
-                                <Option value="Grade 4">Grade 4</Option>
-                                <Option value="Grade 5">Grade 5</Option>
-                                <Option value="Grade 6">Grade 6</Option>
-                                <Option value="Grade 7">Grade 7</Option>
-                              </Select>
-                            </Form.Item>
-                          </Row>
-                          <div style={{ textAlign: "left", margin: 0 }}>
-                            Section
-                          </div>
-                          <Row>
-                            <Form.Item
-                              name="siblingSection"
-                              style={{ width: "100%" }}>
-                              <Select
-                                style={{ textAlign: "left", width: "100%" }}
-                                placeholder="Select Section">
-                                <Option value="A">A</Option>
-                                <Option value="B">B</Option>
-                                <Option value="C">C</Option>
-                                <Option value="D">D</Option>
-                              </Select>
-                            </Form.Item>
-                          </Row>
-                          <div style={{ textAlign: "left", margin: 0 }}>
-                            Name
-                          </div>
-                          <Row>
-                            <Form.Item
-                              name="siblingName"
-                              style={{ width: "100%" }}>
-                              <Input placeholder="Enter Name" />
-                            </Form.Item>
-                          </Row>
-                        </Col>
-                      </Panel>
-                    </Collapse>
-                  </div>
-                </>
-              </div>
+                        <Panel
+                          style={{ textAlign: "left" }}
+                          header="Add Sibling"
+                          key="1">
+                          <Col style={{ width: "100%" }}>
+                            <div
+                              style={{
+                                textAlign: "left",
+                                margin: 0,
+                              }}>
+                              Class
+                            </div>
+                            <Row>
+                              <Form.Item
+                                name="siblingGrade"
+                                style={{ width: "100%" }}>
+                                <Select
+                                  style={{ textAlign: "left" }}
+                                  placeholder="Select Class">
+                                  <Option value="Grade 1">Grade 1</Option>
+                                  <Option value="Grade 2">Grade 2</Option>
+                                  <Option value="Grade 3">Grade 3</Option>
+                                  <Option value="Grade 4">Grade 4</Option>
+                                  <Option value="Grade 5">Grade 5</Option>
+                                  <Option value="Grade 6">Grade 6</Option>
+                                  <Option value="Grade 7">Grade 7</Option>
+                                </Select>
+                              </Form.Item>
+                            </Row>
+                            <div style={{ textAlign: "left", margin: 0 }}>
+                              Section
+                            </div>
+                            <Row>
+                              <Form.Item
+                                name="siblingSection"
+                                style={{ width: "100%" }}>
+                                <Select
+                                  style={{ textAlign: "left", width: "100%" }}
+                                  placeholder="Select Section">
+                                  <Option value="A">A</Option>
+                                  <Option value="B">B</Option>
+                                  <Option value="C">C</Option>
+                                  <Option value="D">D</Option>
+                                </Select>
+                              </Form.Item>
+                            </Row>
+                            <div style={{ textAlign: "left", margin: 0 }}>
+                              Name
+                            </div>
+                            <Row>
+                              <Form.Item
+                                name="siblingName"
+                                style={{ width: "100%" }}>
+                                <Input placeholder="Enter Name" />
+                              </Form.Item>
+                            </Row>
+                          </Col>
+                        </Panel>
+                      </Collapse>
+                    </div> */}
+                  </>
+                </div>
+              </Spin>
             </Form>
           </div>
+
           <div className="admissionOverlay-admissionTwoContainer">
             <div className="admissionOverlay">
               <div
                 className="admissionOverlay-panel admissionOverlay-left"
-                style={{ marginTop: 160 }}>
+                style={{ marginTop: 250 }}>
                 <h1 className="admissionHOne" style={{ marginTop: -610 }}>
                   Welcome Back!
                 </h1>
@@ -864,7 +1238,7 @@ const AdmissionTwo = () => {
               </div>
               <div
                 className="admissionOverlay-panel admissionOverlay-right"
-                style={{ marginTop: 160 }}>
+                style={{ marginTop: 250 }}>
                 <h1 className="admissionHOne" style={{ marginTop: -610 }}>
                   Hello, and Welcome!
                 </h1>

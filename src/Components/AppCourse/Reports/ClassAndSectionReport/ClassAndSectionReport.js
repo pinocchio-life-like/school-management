@@ -1,101 +1,9 @@
 import { Drawer, Table, Typography } from "antd";
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
-import React, { useState } from "react";
-import { EyeOutlined } from "@ant-design/icons";
-const drawerTable = [
-  {
-    admissionNumber: "65433",
-    studentName: "Edward Thomas",
-    class: "Class 2(A)",
-    fatherName: "Olivier Thomas",
-    dob: "2000-12-02",
-    gender: "Male",
-    mobileNumber: "+9876543234",
-  },
-  {
-    admissionNumber: "65433",
-    studentName: "Edward Thomas",
-    class: "Class 2(A)",
-    fatherName: "Olivier Thomas",
-    dob: "2000-12-02",
-    gender: "Male",
-    mobileNumber: "+9876543234",
-  },
-  {
-    admissionNumber: "65433",
-    studentName: "Edward Thomas",
-    class: "Class 2(A)",
-    fatherName: "Olivier Thomas",
-    dob: "2000-12-02",
-    gender: "Male",
-    mobileNumber: "+9876543234",
-  },
-  {
-    admissionNumber: "65433",
-    studentName: "Edward Thomas",
-    class: "Class 2(A)",
-    fatherName: "Olivier Thomas",
-    dob: "2000-12-02",
-    gender: "Male",
-    mobileNumber: "+9876543234",
-  },
+import React, { useEffect, useState } from "react";
+import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 
-  {
-    admissionNumber: "65433",
-    studentName: "Edward Thomas",
-    class: "Class 2(A)",
-    fatherName: "Olivier Thomas",
-    dob: "2000-12-02",
-    gender: "Male",
-    mobileNumber: "+9876543234",
-  },
-  {
-    admissionNumber: "65433",
-    studentName: "Edward Thomas",
-    class: "Class 2(A)",
-    fatherName: "Olivier Thomas",
-    dob: "2000-12-02",
-    gender: "Male",
-    mobileNumber: "+9876543234",
-  },
-  {
-    admissionNumber: "65433",
-    studentName: "Edward Thomas",
-    class: "Class 2(A)",
-    fatherName: "Olivier Thomas",
-    dob: "2000-12-02",
-    gender: "Male",
-    mobileNumber: "+9876543234",
-  },
-  {
-    admissionNumber: "65433",
-    studentName: "Edward Thomas",
-    class: "Class 2(A)",
-    fatherName: "Olivier Thomas",
-    dob: "2000-12-02",
-    gender: "Male",
-    mobileNumber: "+9876543234",
-  },
-  {
-    admissionNumber: "65433",
-    studentName: "Edward Thomas",
-    class: "Class 2(A)",
-    fatherName: "Olivier Thomas",
-    dob: "2000-12-02",
-    gender: "Male",
-    mobileNumber: "+9876543234",
-  },
-  {
-    admissionNumber: "65433",
-    studentName: "Edward Thomas",
-    class: "Class 2(A)",
-    fatherName: "Olivier Thomas",
-    dob: "2000-12-02",
-    gender: "Male",
-    mobileNumber: "+9876543234",
-  },
-];
 const drawerColumn = [
   {
     title: "Admission Number",
@@ -122,65 +30,112 @@ const drawerColumn = [
     dataIndex: "mobileNumber",
   },
 ];
-const originData = [
-  {
-    key: Math.random(),
-    rollNumber: "2353",
-    class: "Class 1(A)",
-    students: 11,
-  },
-  {
-    key: Math.random(),
-    rollNumber: "2353",
-    class: "Class 1(B)",
-    students: 10,
-  },
-  {
-    key: Math.random(),
-    rollNumber: "2353",
-    class: "Class 2(A)",
-    students: 18,
-  },
-  {
-    key: Math.random(),
-    rollNumber: "2353",
-    class: "Class 2(B)",
-    students: 21,
-  },
-  {
-    key: Math.random(),
-    rollNumber: "2353",
-    class: "Class 3(A)",
-    students: 19,
-  },
-  {
-    key: Math.random(),
-    rollNumber: "2353",
-    class: "Class 4(A)",
-    students: 31,
-  },
-  {
-    key: Math.random(),
-    rollNumber: "2353",
-    class: "Class 4(B)",
-    students: 27,
-  },
-  {
-    key: Math.random(),
-    rollNumber: "2353",
-    class: "Class 5(A)",
-    students: 22,
-  },
-  {
-    key: Math.random(),
-    rollNumber: "2353",
-    class: "Class 5(B)",
-    students: 24,
-  },
-];
+let drawerData = [];
 const ClassAndSectionReport = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
-  const showDrawer = () => {
+  const [tableData, setTableData] = useState([]);
+  const [drawerTableData, setDrawerTableData] = useState([]);
+  useEffect(() => {
+    const getClasses = async () => {
+      try {
+        const studentResponse = await fetch(
+          "http://localhost:8080/admission/studentsList"
+        );
+        const studentResponseData = await studentResponse.json();
+        if (studentResponseData.code === 404) {
+          throw new Error("No students found");
+        }
+        const studentData = studentResponseData.students;
+        const classResponse = await fetch(
+          "http://localhost:8080/class/classList"
+        );
+        const classResponseData = await classResponse.json();
+        const classData = classResponseData.classes;
+        const data = [];
+        for (let i = 0; i < classData.length; i++) {
+          for (let j = 0; j < classData[i].section.length; j++) {
+            let studentCount = 0;
+            for (let k = 0; k < studentData.length; k++) {
+              if (
+                studentData[k].grade === classData[i].grade &&
+                studentData[k].section === classData[i].section[j]
+              ) {
+                studentCount++;
+              }
+            }
+            data.push({
+              key: Math.random(),
+              roomNumber: "2353",
+              class: `${classData[i].grade}(${classData[i].section[j]})`,
+              students: studentCount,
+            });
+          }
+        }
+        setTableData(data);
+        const dData = studentData.map((data) => {
+          return {
+            key: Math.random(),
+            admissionNumber: data.admissionNumber,
+            studentName: `${data.firstName} ${data.lastName}`,
+            class: `${data.grade}(${data.section})`,
+            fatherName: `${data.parentFirstName} ${data.parentLastName}`,
+            dob: data.birthDate.slice(0, 10),
+            gender: data.gender,
+            mobileNumber: data.parentPhoneNumber,
+            section: data.section,
+          };
+        });
+        drawerData = dData;
+        // setOriginalData(responseData.classes);
+        // const data = originalData.map((data) => {
+        //   return {
+        //     key: data.admissionNumber,
+        //     studentName: `${data.firstName} ${data.lastName}`,
+        //     studentId: data.admissionNumber,
+        //     grade: data.grade,
+        //     section: data.section,
+        //     dob: data.birthDate.slice(0, 10),
+        //     parentName: `${data.parentFirstName} ${data.parentLastName}`,
+        //     mobileNumber: data.parentPhoneNumber,
+        //     address: `${data.province}, ${data.street}, ${data.houseNumber}`,
+        //   };
+        // });
+        // for (let i = 0; i < classResponseData.classes.length; i++) {
+        //   let sections = [];
+        //   for (
+        //     let j = 0;
+        //     j < classResponseData.classes[i].section.length;
+        //     j++
+        //   ) {
+        //     sections.push(
+        //       <p key={Math.random()}>
+        //         {classResponseData.classes[i].section[j]}
+        //       </p>
+        //     );
+        //   }
+        //   classdata.push({
+        //     key: classResponseData.classes[i].id,
+        //     grade: classResponseData.classes[i].grade,
+        //     section: <>{sections}</>,
+        //   });
+        // }
+        // classData = classdata.map((data) => data);
+        // setFilteredData([...originData]);
+      } catch (err) {
+        // setSearchIsLoading(false);
+        // error("Check for your internet connection and try again");
+        return;
+      }
+    };
+    getClasses();
+  }, []);
+  const showDrawer = (record) => {
+    const grade = record.class.slice(0, 7);
+    const section = record.class.slice(8, 9);
+    const data = drawerData.filter((data) => {
+      return data.class === grade && data.section === section;
+    });
+    setDrawerTableData([...data]);
     setOpenDrawer(true);
   };
   const onClose = () => {
@@ -189,7 +144,7 @@ const ClassAndSectionReport = () => {
   const columns = [
     {
       title: "Room Number",
-      dataIndex: "rollNumber",
+      dataIndex: "roomNumber",
     },
     {
       title: "Class",
@@ -204,10 +159,14 @@ const ClassAndSectionReport = () => {
       dataIndex: "action",
       width: "4%",
       render: (_, record) => {
-        return (
+        return record.students === 0 ? (
+          <Typography.Link disabled={true}>
+            <EyeInvisibleOutlined />
+          </Typography.Link>
+        ) : (
           <Typography.Link
             onClick={() => {
-              showDrawer();
+              showDrawer(record);
             }}>
             <EyeOutlined />
           </Typography.Link>
@@ -219,14 +178,19 @@ const ClassAndSectionReport = () => {
     <div>
       <div
         style={{
+          display: "flex",
           textAlign: "left",
           marginBottom: 10,
+          justifyContent: "space-between",
           marginTop: 0,
-          width: "20%",
+          width: "100%",
         }}>
-        <Title level={4}>Class And Section Report</Title>
+        <Title style={{ marginTop: 0 }} level={4}>
+          Class And Section Report
+        </Title>
         <div>
           <Search
+            enterButton
             placeholder="input search text"
             // onSearch={onSearch}
             style={{
@@ -235,14 +199,14 @@ const ClassAndSectionReport = () => {
           />
         </div>
       </div>
-      <Table size="small" dataSource={originData} columns={columns} />
+      <Table size="small" dataSource={tableData} columns={columns} />
       <Drawer
         title="Student List"
         placement="right"
         onClose={onClose}
         width="90%"
         open={openDrawer}>
-        <Table dataSource={drawerTable} columns={drawerColumn} size="small" />
+        <Table dataSource={drawerData} columns={drawerColumn} size="small" />
       </Drawer>
     </div>
   );

@@ -6,167 +6,48 @@ import {
   Input,
   Form,
   Select,
-  Typography,
   Popconfirm,
   message,
 } from "antd";
 import Title from "antd/es/typography/Title";
-// import { EditFilled, CloseOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./CourseBreakDown.css";
 // import CourseSearchForm from "./CourseSearchForm/CourseSearchForm";
 const { Search } = Input;
 const { Option } = Select;
 
-const originData = [
-  {
-    key: Math.random(),
-    courseName: `Mathemathics`,
-    grade: "Grade 1",
-    courseId: "Math1",
-    teacher: `Not Assigned`,
-  },
-  {
-    key: Math.random(),
-    courseName: `English`,
-    grade: "Grade 1",
-    courseId: "Engl1",
-    teacher: `Not Assigned`,
-  },
-  {
-    key: Math.random(),
-    courseName: `Chemistry`,
-    grade: "Grade 7",
-    courseId: "Chem7",
-    teacher: `Not Assigned`,
-  },
-  {
-    key: Math.random(),
-    courseName: `English`,
-    grade: "Grade 5",
-    courseId: "Engl5",
-    teacher: `Not Assigned`,
-  },
-  {
-    key: Math.random(),
-    courseName: `Biology`,
-    grade: "Grade 7",
-    courseId: "Biol7",
-    teacher: `Not Assigned`,
-  },
-  {
-    key: Math.random(),
-    courseName: `Chemistry `,
-    grade: "Grade 8",
-    courseId: "ChemG8",
-    teacher: `Not Assigned`,
-  },
-];
-
-// Editable Cell
-
-const EditableCell = ({
-  editing,
-  dataIndex,
-  title,
-  inputType,
-  record,
-  index,
-  children,
-  ...restProps
-}) => {
-  return (
-    <td {...restProps}>
-      {editing ? (
-        <Form.Item
-          name={dataIndex}
-          style={{
-            margin: 0,
-          }}
-          rules={[
-            {
-              required: true,
-              message: `Please Input ${title}!`,
-            },
-          ]}>
-          {dataIndex === "grade" ? (
-            <Select placeholder="Select Teacher">
-              <Option value="Grade 1">Grade 1</Option>
-              <Option value="Grade 2">Grade 2</Option>
-              <Option value="Grade 3">Grade 3</Option>
-            </Select>
-          ) : dataIndex === "teacher" ? (
-            <Input readOnly />
-          ) : dataIndex === "courseId" ? (
-            <Input readOnly />
-          ) : (
-            <Input />
-          )}
-        </Form.Item>
-      ) : (
-        children
-      )}
-    </td>
-  );
-};
+let originData = [];
 
 const CourseBreakDown = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [addForm] = Form.useForm();
-  const [editingKey, setEditingKey] = useState("");
-  const [courseIdValue, setCourseIdValue] = useState("none");
+  const [courseIdValue, setCourseIdValue] = useState("Null");
   const [courseNameForId, setCourseNameForId] = useState("");
-  const isEditing = (record) => record.key === editingKey;
   const [messageApi, contextHolder] = message.useMessage();
-  const [filteredData, setFilteredData] = useState(originData);
+  const [filteredData, setFilteredData] = useState([]);
+  useEffect(() => {
+    const getCourses = async () => {
+      const response = await fetch(
+        "http://localhost:8080/course/courseBreakDown"
+      );
+      const responseData = await response.json();
+      originData = responseData.courses;
+      setFilteredData(originData);
+    };
+    getCourses();
+  }, []);
 
-  // edit start start
-  const edit = (record) => {
-    form.setFieldsValue({
-      courseName: "",
-      grade: "",
-      courseId: "",
-      teacher: "",
-      ...record,
-    });
-    setEditingKey(record.key);
-  };
-  //edit start end
-
-  //cancel edit
-  const cancel = () => {
-    setEditingKey("");
-  };
-  // cancel edit || assign end
-  //Save Edit start
-  const save = async (key) => {
-    try {
-      const row = await form.validateFields();
-      const newData = [...filteredData];
-      const index = newData.findIndex((item) => key === item.key);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        setFilteredData(newData);
-        setEditingKey("");
-      } else {
-        newData.push(row);
-        setFilteredData(newData);
-        setEditingKey("");
-      }
-    } catch (errInfo) {
-      console.log("Validate Failed:", errInfo);
-    }
-  };
-
-  const success = () => {
+  const success = (message) => {
     messageApi.open({
       type: "success",
-      content: "Saved Successfully!",
+      content: message,
+    });
+  };
+  const error = (message) => {
+    messageApi.open({
+      type: "error",
+      content: message,
     });
   };
   //Save edit end
@@ -183,56 +64,34 @@ const CourseBreakDown = () => {
       title: "Course Name",
       dataIndex: "courseName",
       width: "21%",
-      editable: true,
-      Assignable: true,
     },
     {
       title: "Grade",
       dataIndex: "grade",
       width: "12%",
-      editable: true,
-      Assignable: true,
     },
     {
       title: "Course Id",
       dataIndex: "courseId",
       width: "14%",
-      editable: true,
-      Assignable: true,
     },
     {
       title: "Teacher",
-      dataIndex: "teacher",
-      width: "25%",
-      editable: true,
-      Assignable: true,
+      dataIndex: "teacherId",
+      width: "18%",
     },
     {
-      width: "15%",
+      title: "Offered",
+      dataIndex: "offered",
+      width: "18%",
+    },
+    {
+      width: "8%",
       title: "operation",
       dataIndex: "operation",
       render: (_, record) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <span>
-            <Typography.Link
-              onClick={() => save(record.key)}
-              style={{
-                marginRight: 8,
-              }}>
-              Save
-            </Typography.Link>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-              <a>Cancel</a>
-            </Popconfirm>
-          </span>
-        ) : (
+        return (
           <Space size="middle">
-            <Typography.Link
-              disabled={editingKey !== ""}
-              onClick={() => edit(record)}>
-              Edit
-            </Typography.Link>
             <Popconfirm
               title="Sure want to delete?"
               onConfirm={() => {
@@ -248,41 +107,48 @@ const CourseBreakDown = () => {
 
   //table columns end
 
-  //columns merge start
-
-  const mergedColumns = columns.map((col) => {
-    if (!col.editable) {
-      return col;
-    } else if (!col.Assignable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record) => ({
-        record,
-        inputType: col.dataIndex === "grade" ? "number" : "text",
-        dataIndex: col.dataIndex,
-        title: col.title,
-        editing: isEditing(record),
-      }),
-    };
-  });
-
-  // columns merge end
-
   // const [expandable, setExpandable] = useState(true);
 
-  const onFinish = (values) => {
-    originData.push({
-      key: Math.random(),
-      courseName: `${values.courseName}`,
-      grade: `${values.grade}`,
-      courseId: `${courseIdValue}`,
-      teacher: `Not Assigned`,
-    });
-    success();
-    // console.log("Finish:", values, courseIdValue);
-    setFilteredData([...originData]);
+  const onFinish = async (values) => {
+    try {
+      const response = await fetch(
+        "http://localhost:8080/course/courseBreakDown",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            courseName: values.courseName,
+            grade: values.grade,
+            courseId: courseIdValue,
+            offered: "Not Offered",
+            teacherId: "Not Assigned",
+          }),
+        }
+      );
+      const responseData = await response.json();
+      if (responseData.code === 404) {
+        throw new Error("Record Already Exists");
+      }
+      originData.push(responseData.course);
+      console.log(responseData);
+      setFilteredData([...originData]);
+      success("saved Successfully");
+      addForm.resetFields();
+      setCourseIdValue("Null");
+    } catch (err) {
+      error("Course Already Exists");
+      console.log(err);
+    }
+    // originData.push({
+    //   key: Math.random(),
+    //   courseName: `${values.courseName}`,
+    //   grade: `${values.grade}`,
+    //   courseId: `${courseIdValue}`,
+    //   teacher: `Not Assigned`,
+    // });
+    // setFilteredData([...originData]);
   };
   const onGradeSelectChange = (value) => {
     const gradeforId = value
@@ -352,7 +218,7 @@ const CourseBreakDown = () => {
           onFinish={onFinish}>
           <Form.Item
             label="Course Name"
-            style={{ minWidth: 250 }}
+            style={{ minWidth: 330, marginTop: 9 }}
             name="courseName"
             rules={[
               {
@@ -369,7 +235,7 @@ const CourseBreakDown = () => {
           </Form.Item>
           <Form.Item
             label="Grade"
-            style={{ minWidth: 250, textAlign: "left", marginTop: -20 }}
+            style={{ minWidth: 330, textAlign: "left", marginTop: -20 }}
             name="grade"
             rules={[
               {
@@ -386,11 +252,14 @@ const CourseBreakDown = () => {
               <Option value="Grade 3">Grade 3</Option>
               <Option value="Grade 4">Grade 4</Option>
               <Option value="Grade 5">Grade 5</Option>
+              <Option value="Grade 6">Grade 6</Option>
+              <Option value="Grade 7">Grade 7</Option>
+              <Option value="Grade 8">Grade 8</Option>
             </Select>
           </Form.Item>
           <Form.Item
             label="Course ID"
-            style={{ minWidth: 250, marginTop: -20 }}
+            style={{ minWidth: 330, marginTop: -20 }}
             name="courseId"
             rules={[
               {
@@ -407,12 +276,7 @@ const CourseBreakDown = () => {
                 paddingTop: "4px",
                 paddingLeft: "10px",
                 marginTop: -10,
-              }}
-              // readOnly
-              // defaultValue=
-              // type="text"
-              // placeholder="Course Id"
-            >
+              }}>
               <strong>{courseIdValue}</strong>
             </div>
           </Form.Item>
@@ -465,18 +329,11 @@ const CourseBreakDown = () => {
           <div>
             <Form form={form} component={false}>
               <Table
-                components={{
-                  body: {
-                    cell: EditableCell,
-                  },
-                }}
                 bordered
                 dataSource={filteredData}
-                columns={mergedColumns}
+                columns={columns}
                 rowClassName="editable-row"
-                pagination={{
-                  onChange: cancel,
-                }}
+                pagination={true}
               />
             </Form>
           </div>

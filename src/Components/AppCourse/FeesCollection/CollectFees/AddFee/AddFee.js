@@ -8,9 +8,12 @@ import {
   FilePdfOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./AddFee.css";
 import { Link } from "react-router-dom";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 import {
   Button,
   Col,
@@ -27,250 +30,18 @@ import {
   Space,
   Table,
   Tabs,
+  message,
 } from "antd";
+const docx = require("docx");
 const { Option } = Select;
-const originData = [
-  {
-    key: Math.random(),
-    feeName: `General (Admission Fees)`,
-    feeCode: "admission-fees",
-    feeStartDate: "12-01-2023",
-    feeDueDate: "2-02-2023",
-    status: (
-      <span
-        style={{
-          background: "#D61355",
-          borderRadius: 3,
-          color: "white",
-        }}>
-        Not Paid
-      </span>
-    ),
-    amount: "1000.00",
-    total: "N/A",
-    paymentId: "N/A",
-    paymentMode: "N/A",
-    payedDate: "N/A",
-    paymentFine: "0.00",
-    due: `On Time`,
-  },
-  {
-    key: Math.random(),
-    feeName: `General (Admission Fees)`,
-    feeCode: "admission-fees",
-    feeStartDate: "12-01-2023",
-    feeDueDate: "12-02-2023",
-    status: (
-      <span
-        style={{
-          background: "#1F8A70",
-          borderRadius: 3,
-          color: "white",
-        }}>
-        Paid
-      </span>
-    ),
-    amount: "1000.00",
-    total: "1000",
-    paymentId: "488/1",
-    paymentMode: "Cash",
-    payedDate: "01-02-2023",
-    paymentFine: "0.00",
-    due: `On Time`,
-  },
-  {
-    key: Math.random(),
-    feeName: `General (Admission Fees)`,
-    feeCode: "admission-fees",
-    feeStartDate: "12-01-2023",
-    feeDueDate: "12-02-2023",
-    status: (
-      <span
-        style={{
-          background: "#1F8A70",
-          borderRadius: 3,
-          color: "white",
-        }}>
-        Paid
-      </span>
-    ),
-    amount: "1000.00",
-    total: "1000",
-    paymentId: "488/1",
-    paymentMode: "Cash",
-    payedDate: "01-02-2023",
-    paymentFine: "0.00",
-    due: `On Time`,
-  },
-  {
-    key: Math.random(),
-    feeName: `General (Admission Fees)`,
-    feeCode: "admission-fees",
-    feeStartDate: "12-01-2023",
-    feeDueDate: "12-02-2023",
-    status: (
-      <span
-        style={{
-          background: "#1F8A70",
-          borderRadius: 3,
-          color: "white",
-        }}>
-        Paid
-      </span>
-    ),
-    amount: "1000.00",
-    total: "1000",
-    paymentId: "488/1",
-    paymentMode: "Cash",
-    payedDate: "01-02-2023",
-    paymentFine: "0.00",
-    due: `On Time`,
-  },
-  {
-    key: Math.random(),
-    feeName: `General (Admission Fees)`,
-    feeCode: "admission-fees",
-    feeStartDate: "12-01-2023",
-    feeDueDate: "2-02-2023",
-    status: (
-      <span
-        style={{
-          background: "#D61355",
-          borderRadius: 3,
-          color: "white",
-        }}>
-        Not Paid
-      </span>
-    ),
-    amount: "1000.00",
-    total: "N/A",
-    paymentId: "N/A",
-    paymentMode: "N/A",
-    payedDate: "N/A",
-    paymentFine: "0.00",
-    due: `On Time`,
-  },
-  {
-    key: Math.random(),
-    feeName: `General (Admission Fees)`,
-    feeCode: "admission-fees",
-    feeStartDate: "12-01-2023",
-    feeDueDate: "12-02-2023",
-    status: (
-      <span
-        style={{
-          background: "#1F8A70",
-          borderRadius: 3,
-          color: "white",
-        }}>
-        Paid
-      </span>
-    ),
-    amount: "1000.00",
-    total: "1000",
-    paymentId: "488/1",
-    paymentMode: "Cash",
-    payedDate: "01-02-2023",
-    paymentFine: "0.00",
-    due: `On Time`,
-  },
-  {
-    key: Math.random(),
-    feeName: `General (Admission Fees)`,
-    feeCode: "admission-fees",
-    feeStartDate: "12-01-2023",
-    feeDueDate: "2-02-2023",
-    status: (
-      <span
-        style={{
-          background: "#D61355",
-          borderRadius: 3,
-          color: "white",
-        }}>
-        Not Paid
-      </span>
-    ),
-    amount: "1000.00",
-    total: "N/A",
-    paymentId: "N/A",
-    paymentMode: "N/A",
-    payedDate: "N/A",
-    paymentFine: "0.00",
-    due: `On Time`,
-  },
-  {
-    key: Math.random(),
-    feeName: `General (Admission Fees)`,
-    feeCode: "admission-fees",
-    feeStartDate: "12-01-2023",
-    feeDueDate: "2-02-2023",
-    status: (
-      <span
-        style={{
-          background: "#D61355",
-          borderRadius: 3,
-          color: "white",
-        }}>
-        Not Paid
-      </span>
-    ),
-    amount: "1000.00",
-    total: "N/A",
-    paymentId: "N/A",
-    paymentMode: "N/A",
-    payedDate: "N/A",
-    paymentFine: "0.00",
-    due: `On Time`,
-  },
-  {
-    key: Math.random(),
-    feeName: `General (Admission Fees)`,
-    feeCode: "admission-fees",
-    feeStartDate: "12-01-2023",
-    feeDueDate: "12-02-2023",
-    status: (
-      <span
-        style={{
-          background: "#1F8A70",
-          borderRadius: 3,
-          color: "white",
-        }}>
-        Paid
-      </span>
-    ),
-    amount: "1000.00",
-    total: "1000",
-    paymentId: "488/1",
-    paymentMode: "Cash",
-    payedDate: "01-02-2023",
-    paymentFine: "0.00",
-    due: `On Time`,
-  },
-  {
-    key: Math.random(),
-    feeName: `General (Admission Fees)`,
-    feeCode: "admission-fees",
-    feeStartDate: "12-01-2023",
-    feeDueDate: "12-02-2023",
-    status: (
-      <span
-        style={{
-          background: "#1F8A70",
-          borderRadius: 3,
-          color: "white",
-        }}>
-        Paid
-      </span>
-    ),
-    amount: "1000.00",
-    total: "1000",
-    paymentId: "488/1",
-    paymentMode: "Cash",
-    payedDate: "01-02-2023",
-    paymentFine: "0.00",
-    due: `On Time`,
-  },
-];
+
+function isPastDate(dateStr) {
+  const [day, month, year] = dateStr.split("-");
+  const inputDate = new Date(year, month - 1, day);
+  const today = new Date();
+  return inputDate < today;
+}
+let originData = [];
 
 const AddFee = () => {
   const [form] = Form.useForm();
@@ -284,21 +55,110 @@ const AddFee = () => {
   const [openFeeModal, setOpenFeeModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [paymentRender, setPaymentRender] = useState("");
-  const [payingRecord, setPayingRecord] = useState("");
+  const [payingRecord, setPayingRecord] = useState([]);
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [isFined, setIsFined] = useState(false);
   const [fineAmount, setFineAmount] = useState(0);
   const [total, setTotal] = useState(0);
   const [tableData, setTableData] = useState(originData);
+  const payingStudent = localStorage.getItem("payingStudent");
+  const [messageApi, contextHolder] = message.useMessage();
+
+  useEffect(() => {
+    const getFees = async () => {
+      const response = await fetch("http://localhost:8080/fee/feeList");
+      const responseData = await response.json();
+      const data = responseData.fees;
+
+      let theFees = data.map((data) => {
+        const holder = data.studentsList.filter((stud) => {
+          return stud.studentId === payingStudent;
+        });
+
+        // let date = new Date(data.feeDueDate);
+        // date = date.toLocaleDateString("es-CL");
+
+        return {
+          key: data.feeId,
+          feeName: data.feeName,
+          feeType: data.feeType,
+          feeStartDate: data.feeStartDate,
+          feeDueDate: data.feeDueDate,
+          status:
+            holder[0].paymentStatus === "Not Paid" ? (
+              <span
+                style={{
+                  background: "#D61355",
+                  borderRadius: 3,
+                  color: "white",
+                }}>
+                Not Paid
+              </span>
+            ) : (
+              <span
+                style={{
+                  background: "#1F8A70",
+                  borderRadius: 3,
+                  color: "white",
+                }}>
+                Paid
+              </span>
+            ),
+          amount: data.amount,
+          total:
+            holder[0].paymentStatus === "Not Paid" ? "N/A" : holder[0].total,
+          paymentId:
+            holder[0].paymentStatus === "Not Paid"
+              ? "N/A"
+              : holder[0].paymentId,
+          paymentMode:
+            holder[0].paymentStatus === "Not Paid"
+              ? "N/A"
+              : holder[0].paymentMode,
+          payedDate:
+            holder[0].paymentStatus === "Not Paid"
+              ? "N/A"
+              : holder[0].payedDate,
+          paymentFine:
+            holder[0].paymentStatus === "Paid"
+              ? holder[0].fine
+              : isPastDate(data.feeDueDate)
+              ? data.fineAmount
+              : "N/A",
+          due: isPastDate(data.feeDueDate)
+            ? "Late"
+            : holder[0].due
+            ? "On Time"
+            : "N/A",
+          fineAmount: isPastDate(data.feeDueDate) ? data.fineAmount : 0,
+        };
+      });
+      originData = theFees;
+      setTableData(originData);
+    };
+    getFees();
+  }, []);
+  const success = (message) => {
+    messageApi.open({
+      type: "success",
+      content: message,
+    });
+  };
+  const error = (message) => {
+    messageApi.open({
+      type: "error",
+      content: message,
+    });
+  };
   const showModal = () => {
     setOpenFeeModal(true);
   };
   const handleOk = () => {
-    setFeeSubmitLoading(true);
-    setTimeout(() => {
-      setFeeSubmitLoading(false);
-      setOpenFeeModal(false);
-    }, 3000);
+    // setFeeSubmitLoading(true);
+    // setTimeout(() => {
+    //   setFeeSubmitLoading(false);
+    // }, 10);
+    setOpenFeeModal(false);
   };
   const handleCancel = () => {
     setOpenFeeModal(false);
@@ -325,6 +185,132 @@ const AddFee = () => {
     selectedRowKeys,
     onChange: onSelectChange,
   };
+
+  const printClickHandler = async (record) => {
+    const doc = new jsPDF();
+
+    // Set the background color of the PDF to a light gray
+    doc.setFillColor(255, 255, 255);
+    doc.rect(
+      0,
+      0,
+      doc.internal.pageSize.width,
+      doc.internal.pageSize.height - 180,
+      "F"
+    );
+
+    // Set the title of the invoice
+    doc.setFontSize(35);
+    doc.setTextColor(20, 108, 148); // Set text color to light red
+    doc.setFont("times", "roman"); // Set font family to Times New Roman
+    doc.text(`Ozone School`, 15, 20);
+
+    // Set the title of the invoice
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0); // Set text color to light red
+    doc.setFont("times", "roman"); // Set font family to Times New Roman
+    doc.text(`Address: Addis Ababa, Yeka, Karra`, 15, 28);
+
+    // Set the title of the invoice
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0); // Set text color to light red
+    doc.setFont("times", "roman"); // Set font family to Times New Roman
+    doc.text(`Phone: +251 940 636 550`, 15, 36);
+
+    // Set the title of the invoice
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0); // Set text color to light red
+    doc.setFont("times", "roman"); // Set font family to Times New Roman
+    doc.text(`Email: icbr19fl@gmail.com`, 15, 44);
+
+    // Set the title of the invoice
+    doc.setFontSize(30);
+    doc.setTextColor(20, 108, 148); // Set text color to light red
+    doc.setFont("times", "roman"); // Set font family to Times New Roman
+    doc.text(`${record.feeName}`, doc.internal.pageSize.width - 14, 20, {
+      align: "right",
+    });
+    // Add the payment date
+    doc.setFontSize(13);
+    doc.setTextColor(0, 0, 0); // Set text color to black
+    doc.text(
+      `Payment Date: ${record.payedDate}`,
+      doc.internal.pageSize.width - 14,
+      28,
+      { align: "right" }
+    );
+    // Add the payment date
+    doc.setFontSize(13);
+    doc.setTextColor(0, 0, 0); // Set text color to black
+    doc.text(
+      `Payment Due: ${record.due}`,
+      doc.internal.pageSize.width - 14,
+      36,
+      { align: "right" }
+    );
+
+    // Add the payment date
+    doc.setFontSize(13);
+    doc.setTextColor(0, 0, 0); // Set text color to black
+    doc.text(
+      `Payment ID: ${record.paymentId}`,
+      doc.internal.pageSize.width - 14,
+      44,
+      { align: "right" }
+    );
+
+    // Create the table headers
+    const headers = [["Description", "Type", "Mode", "Fine", "Total"]];
+
+    // Create the table data
+    const data = [
+      [
+        record.feeName,
+        record.feeType,
+        record.paymentMode,
+        record.paymentFine,
+        record.total,
+      ],
+    ];
+
+    // Add the table to the PDF document
+    doc.autoTable({
+      head: headers,
+      body: data,
+      startY: 50,
+      theme: "grid",
+      styles: {
+        font: "times",
+        fontStyle: "normal",
+        fontSize: 12,
+        overflow: "linebreak",
+      },
+      headStyles: {
+        fillColor: [20, 108, 148],
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+      },
+      margin: { top: 20 },
+    });
+
+    // Add the signature
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0); // Set text color to black
+    doc.text(`Issued By: `, 15, doc.autoTable.previous.finalY + 20);
+
+    // Add the signature
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0); // Set text color to black
+    doc.text(
+      `Signature: _______________`,
+      15,
+      doc.autoTable.previous.finalY + 28
+    );
+
+    // Save the PDF file
+    doc.save(`${record.feeName}-invoice.pdf`);
+  };
+
   const columns = [
     {
       title: "Fee Name",
@@ -333,8 +319,8 @@ const AddFee = () => {
       editable: true,
     },
     {
-      title: "Fee Code",
-      dataIndex: "feeCode",
+      title: "Fee Type",
+      dataIndex: "feeType",
       width: "9.5%",
       editable: true,
     },
@@ -398,10 +384,10 @@ const AddFee = () => {
       width: "35%",
       editable: true,
       render: (_, record) => {
-        const dueDate = new Date(record.feeDueDate);
-        const todayDate = new Date();
-        const dateDifference = dueDate.getTime() - todayDate.getTime();
-        return dateDifference < 0 ? "Late" : "On Time";
+        const [day, month, year] = record.feeDueDate.split("-");
+        const inputDate = new Date(year, month - 1, day);
+        const today = new Date();
+        return inputDate < today ? "Late" : "On Time";
       },
     },
     {
@@ -420,16 +406,8 @@ const AddFee = () => {
                   setModalTitle(`${record.feeName}`);
                   const amount = Number(record.amount);
                   setPaymentAmount(amount);
-                  const dueDate = new Date(record.feeDueDate);
-                  const todayDate = new Date();
-                  const dateDifference =
-                    dueDate.getTime() - todayDate.getTime();
-                  if (dateDifference < 0) {
-                    setIsFined(true);
-                    setFineAmount(150);
-                  }
-                  setTotal(150 + amount);
-                  //   console.log(dueDate);
+                  setFineAmount(record.fineAmount);
+                  setTotal(record.fineAmount + amount);
                   setPayingRecord(record);
                   showModal();
                 }}>
@@ -438,17 +416,31 @@ const AddFee = () => {
                 />
               </Typography.Link>
             ) : (
-              ""
+              <Typography.Link
+                onClick={() => {
+                  const data = {
+                    feeName: record.feeName,
+                    feeType: record.feeType,
+                    paymentId: record.paymentId,
+                    paymentMode: record.paymentMode,
+                    payedDate: record.payedDate,
+                    due: record.due,
+                    paymentFine: record.paymentFine,
+                    total: record.total,
+                  };
+                  printClickHandler(data);
+                }}>
+                <PrinterOutlined />
+              </Typography.Link>
             )}
-            <Typography.Link>
-              <PrinterOutlined />
-            </Typography.Link>
           </Space>
         );
       },
     },
   ];
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
+    let date = new Date();
+    date = date.toLocaleDateString("es-CL");
     const indexValue = originData.indexOf(payingRecord);
     let due = "";
     if (values.fine > 0) {
@@ -465,9 +457,9 @@ const AddFee = () => {
       paymentMode = values.chequeId;
     }
     const data = {
-      key: Math.random(),
+      key: payingRecord.key,
       feeName: payingRecord.feeName,
-      feeCode: payingRecord.feeCode,
+      feeType: payingRecord.feeType,
       feeStartDate: payingRecord.feeStartDate,
       feeDueDate: payingRecord.feeDueDate,
       status: (
@@ -484,16 +476,40 @@ const AddFee = () => {
       total: total,
       paymentId: paymentMode,
       paymentMode: values.paymentType,
-      payedDate: todayDate.slice(4),
+      payedDate: date,
       paymentFine: fineAmount,
       due: due,
     };
+    const sentData = {
+      feeId: payingRecord.key,
+      studentId: payingStudent,
+      paymentStatus: "Paid",
+      fine: fineAmount,
+      total: total,
+      due: due,
+      paymentMode: values.paymentType,
+      payedDate: date,
+      paymentId: paymentMode,
+    };
+    try {
+      await fetch(`http://localhost:8080/fee/feeList/${payingRecord.key}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sentData),
+      });
+    } catch (err) {
+      error("Check Your Internet Connection And Try Again");
+      return;
+    }
     originData.splice(indexValue, 1, data);
     setTableData([...originData]);
+    success("Payed Successfully");
+    setPayingRecord([]);
   };
   const hasSelected = selectedRowKeys.length > 0;
   return (
     <div>
+      {contextHolder}
       <div className="AddFeeCss">
         <div className="StudentFeePageTitle">
           <Title
@@ -660,7 +676,7 @@ const AddFee = () => {
             </div>
             <div
               className="PrintAndLikeOptions"
-              style={{ textAlign: "right", marginRight: 10, marginTop: -33 }}>
+              style={{ textAlign: "right", marginRight: 10, marginTop: -5 }}>
               <FilePdfOutlined />
             </div>
           </div>
@@ -738,10 +754,10 @@ const AddFee = () => {
                           paddingTop: 3,
                           border: "1px solid #ccc",
                           width: "100%",
-                          height: 26,
+                          height: 32,
                           borderRadius: 5,
                         }}>
-                        <span style={{ paddingLeft: 5 }}>{total}</span>
+                        <span style={{ paddingLeft: 10 }}>{total}</span>
                       </div>
                     </Form.Item>
                   </Col>
@@ -764,6 +780,7 @@ const AddFee = () => {
                         setPaymentRender(
                           <Form.Item name="chequeId" required label="Cheque Id">
                             <Input />
+                            paymentRender{" "}
                           </Form.Item>
                         );
                       }

@@ -12,7 +12,7 @@ const AppFooter = () => {
           textAlign: "center",
           width: "100%",
         }}>
-        Ant Design ©2023 Created by Ant UED
+        SIRM ©2023 Created Eliyas Asefa
       </Footer>
     </div>
   );

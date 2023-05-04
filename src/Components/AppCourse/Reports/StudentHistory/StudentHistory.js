@@ -190,11 +190,9 @@ const StudentHistory = () => {
   };
   return (
     <div>
-      <div>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div>
-          <Title
-            level={4}
-            style={{ textAlign: "left", marginBottom: 20, marginTop: 15 }}>
+          <Title level={4} style={{ textAlign: "left", marginTop: 0 }}>
             Student History
           </Title>
         </div>
@@ -203,19 +201,21 @@ const StudentHistory = () => {
           onFinish={onFinish}
           style={{ display: "flex", textAlign: "left" }}>
           <Form.Item noStyle name="class">
-            <Select placeholder="Class" style={{ width: "46%" }}>
+            <Select placeholder="Class" style={{ width: 220 }}>
               <Option value="Class 1">Class 1</Option>
               <Option value="Class 2">Class 2</Option>
               <Option value="Class 3">Class 3</Option>
               <Option value="Class 4">Class 4</Option>
               <Option value="Class 5">Class 5</Option>
               <Option value="Class 6">Class 6</Option>
+              <Option value="Class 7">Class 7</Option>
+              <Option value="Class 8">Class 8</Option>
             </Select>
           </Form.Item>
           <Form.Item noStyle name="admissionDate">
             <Select
               placeholder="Admission Year"
-              style={{ width: "46.3%", marginLeft: 10 }}>
+              style={{ width: 220, marginLeft: 10 }}>
               <Option value="2021">2021</Option>
               <Option value="2022">2022</Option>
               <Option value="2023">2023</Option>

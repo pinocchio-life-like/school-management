@@ -314,3 +314,19 @@ const onSearchFinish = (values) => {
       setFilteredData(originData);
     }
   };
+
+
+
+  //proposal
+  Hi there! I'm a highly motivated and skilled Graphic and Motion Designer with over 15 years experience.
+
+I believe in creating engaging and impactful design solutions that stay true to your brand and help take it to the next level.
+
+Specialising in:
+• Brand films
+• Animation
+• Video editing
+• 3D packaging
+• PowerPoint presentations
+
+I am extremely communicative and ensure projects are completed on schedule and to the highest standard. If you think I would be a good fit for your project I would love to hear from you!

@@ -11,13 +11,13 @@
 }
 
 .StudentListTitle {
-    background-color: rgba(69, 147, 255, 0.3);
+    /* background-color: rgba(69, 147, 255, 0.3); */
     /* border-top-left-radius: 9px; */
     grid-area: StudentListTitle;
 }
 
 .StudentListSearch {
-    background-color: rgba(69, 147, 255, 0.3);
+    /* background-color: rgba(69, 147, 255, 0.3); */
     border-top-right-radius: 9px;
     grid-area: StudentListSearch;
 }
