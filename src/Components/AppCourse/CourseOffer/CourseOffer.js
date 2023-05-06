@@ -112,20 +112,16 @@ const CourseOffer = () => {
   //On finish adding course Group
   const onFinish = async (values) => {
     setIsSaving(true);
-    const notOffered = filteredData.map((course) => {
-      return course.courseName;
-    });
-    const offeredID = filteredData.filter((id, i) => {
-      return id.courseName === values.courses[i] ? id.courseId : undefined;
-    });
-    const offeredId = offeredID.map((course) => {
-      return course.courseId;
-    });
-    for (let i = 0; i < values.courses.length; i++) {
-      const indexValue = notOffered.indexOf(values.courses[i]);
-      notOffered.splice(indexValue, 1);
+    const notOffered = filteredData.map((course) => course.courseName);
+    const offeredId = [];
+    for (const course of values.courses) {
+      const matchingCourse = filteredData.find((c) => c.courseName === course);
+      if (matchingCourse) {
+        offeredId.push(matchingCourse.courseId);
+        notOffered.splice(notOffered.indexOf(course), 1);
+      }
     }
-    // console.log(offeredId);
+
     const courseGroup = {
       courseGroupName: `${searchKey} Courses Group`,
       offered: values.courses,
@@ -186,7 +182,7 @@ const CourseOffer = () => {
   };
   //on change checkbox
   const onChangeCheckBox = (checkedValues) => {
-    console.log("checked = ", checkedValues);
+    // console.log("checked = ", checkedValues);
   };
   //on selected row reload
   const start = () => {
@@ -206,12 +202,12 @@ const CourseOffer = () => {
     const selectedCourses = [];
     for (let i = 0; i < filteredData.length; i++) {
       // console.log(filteredData[i].key);
-      console.log(filteredData[i].courseId);
+      // console.log(filteredData[i].courseId);
       for (let j = 0; j < newSelectedRowKeys.length; j++) {
         if (filteredData[i].key === newSelectedRowKeys[j]) {
           selectedCourses.push(
             <Row>
-              <Checkbox value={filteredData[i].courseName}>
+              <Checkbox key={Math.random()} value={filteredData[i].courseName}>
                 {filteredData[i].courseName}
               </Checkbox>
             </Row>

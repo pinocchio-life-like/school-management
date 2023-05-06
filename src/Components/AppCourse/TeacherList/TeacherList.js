@@ -402,7 +402,6 @@ const TeacherList = () => {
       return <p>{grade}</p>;
     });
     let length = originData.length;
-    // console.log("teacher", length);
 
     try {
       const teacherId = `${values.teacherName.split(" ")[0]}0${length}`;
@@ -416,14 +415,7 @@ const TeacherList = () => {
         status: `Not Assigned`,
       };
       originData.unshift(addedData);
-      const courseAndsection = [];
-      for (let i = 0; i < normalID.length; i++) {
-        for (let j = 0; j < normalID[i].length; j++)
-          courseAndsection.push({
-            coursesId: normalID[i][j],
-            sections: [],
-          });
-      }
+
       const response = await fetch(
         "http://localhost:8080/teacher/teacherList",
         {
@@ -439,7 +431,7 @@ const TeacherList = () => {
             coursesId: normalID,
             competitionalLevel: values.competitionalLevel,
             status: `Not Assigned`,
-            assignedTo: courseAndsection,
+            assignedTo: [[]],
           }),
         }
       );

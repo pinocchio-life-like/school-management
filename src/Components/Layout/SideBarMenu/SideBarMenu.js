@@ -8,9 +8,10 @@ import {
   DollarCircleOutlined,
   SnippetsOutlined,
   FileDoneOutlined,
+  AppstoreOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 const Year = new Date();
 const CalenderYear = Year.getFullYear();
@@ -24,6 +25,14 @@ function getItem(label, key, icon, children) {
 }
 
 const items = [
+  getItem("DashBoard", "sub1", <AppstoreOutlined />, [
+    getItem("Admin", "/feesGroup"),
+    getItem("Teacher", "/collectFees"),
+    getItem("Student", "/collectFees"),
+    getItem("Transport", "/collectFees"),
+    getItem("Inventory", "/collectFees"),
+    getItem("Human Resource", "/collectFees"),
+  ]),
   getItem("Class", "/classList", <PicCenterOutlined />),
   getItem("Course", "sub2", <DeploymentUnitOutlined />, [
     getItem("Course Break Down", "/courseBreakDown"),
@@ -56,15 +65,30 @@ const items = [
     getItem("Student History Report", "/studentHistoryReport"),
     getItem("Gender Ratio Report", "/genderRatioReport"),
   ]),
+
   // getItem("Reports", "/reports", <BarChartOutlined />),
 ];
-const SideBarMenu = () => {
+const SideBarMenu = (props) => {
   const navigate = useNavigate();
+  const [openKeys, setOpenKeys] = useState([]);
+
+  const handleOpenChange = (keys) => {
+    console.log([keys[keys.length - 1]]);
+    setOpenKeys([keys[keys.length - 1]]);
+  };
   return (
     <div>
       <Menu
-        theme="dark"
+        style={{
+          fontSize: 15,
+          fontWeight: 600,
+          color: "rgba(0, 0, 0, 0.5)",
+          width: props.width,
+        }}
+        theme="light"
         mode="inline"
+        openKeys={openKeys}
+        onOpenChange={handleOpenChange}
         // defaultSelectedKeys={["3"]}
         items={items}
         onClick={({ key }) => {

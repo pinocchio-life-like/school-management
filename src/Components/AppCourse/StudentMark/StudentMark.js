@@ -228,7 +228,11 @@ const StudentMark = () => {
     const grade = localStorage.getItem("grade");
     localStorage.setItem("section", value);
     const stud = StudentData.filter((data) => {
-      return data.section === value && data.grade === grade;
+      return (
+        data.section === value &&
+        data.grade === grade &&
+        data.admissionStatus === "admitted"
+      );
     });
     setStudents([...stud]);
   };

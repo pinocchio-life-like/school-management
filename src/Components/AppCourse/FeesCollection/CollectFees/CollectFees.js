@@ -114,8 +114,21 @@ const CollectFees = () => {
         return (
           <Space size="middle">
             <Typography.Link
-              onClick={() => {
+              onClick={async () => {
                 localStorage.setItem("payingStudent", record.key);
+                try {
+                  await fetch(
+                    `http://localhost:8080/fee/feeList/add/${record.key}`,
+                    {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify([]),
+                    }
+                  );
+                } catch (err) {
+                  error("Check Your Internet Connection And Try Again");
+                  return;
+                }
               }}>
               <Link to="/addFee">Collect Fess</Link>
             </Typography.Link>

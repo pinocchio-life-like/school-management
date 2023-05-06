@@ -23,19 +23,16 @@ let originalData = [];
 let courseData = [];
 let tableRecord = [];
 
-// Editable Cell
 const convertData = (data) => {
-  console.log(data);
+  tableRecord = data;
   let result = {
     key: data.key,
     teacherName: data.teacherName,
     grade: { props: { children: [] } },
     status: data.status,
   };
-  // console.log(data);
   data.grade.forEach((grade, index) => {
     let gradeCourses = data.coursesId[index];
-    // console.log(gradeCourses);
     let gradeSections = [];
     data.assignedTo.forEach((item) => {
       if (gradeCourses.includes(item.coursesId)) {
@@ -43,7 +40,9 @@ const convertData = (data) => {
       }
     });
     result.grade.props.children.push(
-      <li style={{ marginLeft: -20, display: "inline" }}>{grade}</li>
+      <li key={Math.random()} style={{ marginLeft: -20, display: "inline" }}>
+        {grade}
+      </li>
     );
 
     gradeCourses.forEach((course, courseIndex) => {
@@ -54,7 +53,7 @@ const convertData = (data) => {
         }
       });
       result.grade.props.children.push(
-        <li>
+        <li key={Math.random()}>
           {course} {sections.join(", ")}
         </li>
       );
@@ -70,12 +69,13 @@ const AssignTeacherToCourse = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [sectionsForEachGrade, setSectionsForEachGrade] = useState([]);
   const [tableData, setTableData] = useState(originData);
+  const [effecter, setEffecter] = useState(0);
 
   useEffect(() => {
     const getClasses = async () => {
       const response = await fetch("http://localhost:8080/teacher/teacherList");
       const responseData = await response.json();
-      console.log(responseData.teachers);
+
       const courseResponse = await fetch(
         "http://localhost:8080/course/courseBreakDown"
       );
@@ -90,7 +90,6 @@ const AssignTeacherToCourse = () => {
         for (let k = 0; k < responseData.teachers[i].coursesId.length; k++) {
           const course = [];
           for (let j = 0; j < courseData.length; j++) {
-            // console.log(responseData.teachers[i].coursesId[k]);
             for (
               let l = 0;
               l < responseData.teachers[i].coursesId[k].length;
@@ -111,12 +110,10 @@ const AssignTeacherToCourse = () => {
             courseName: course,
           });
         }
-        // console.log(insideCourse);
         for (let j = 0; j < insideCourse.length; j++) {
           const courseName = [];
           const courseId = [];
           for (let l = 0; l < insideCourse[j].courseName.length; l++) {
-            // console.log(insideCourse[j].courseName[l]);
             courseName.push(
               <li key={Math.random()}>{insideCourse[j].courseName[l]}</li>
             );
@@ -145,17 +142,18 @@ const AssignTeacherToCourse = () => {
           );
           normalID.push(responseData.teachers[i].coursesId[j]);
         }
-        const sectionsSet = responseData.teachers[i].assignedTo.map((obj) => ({
-          [obj.coursesId]: obj.sections.join(", "),
-        }));
-
-        const listValues = sectionsSet.map((obj) => {
-          return (
+        const listValues = [];
+        for (
+          let n = 0;
+          n < responseData.teachers[i].assignedTo[0].length;
+          n++
+        ) {
+          listValues.push(
             <li key={Math.random()}>
-              {Object.keys(obj)[0]} : {Object.values(obj)[0]}
+              {responseData.teachers[i].assignedTo[0][n]}
             </li>
           );
-        });
+        }
 
         data.push({
           key: responseData.teachers[i].teacherId,
@@ -163,12 +161,16 @@ const AssignTeacherToCourse = () => {
           grade: grade,
           coursesId: <>{coursesId}</>,
           competitionalLevel: responseData.teachers[i].competitionalLevel,
-          status: (
-            <ul style={{ listStyleType: "none", padding: 0 }}>{listValues}</ul>
-          ),
+          status:
+            responseData.teachers[i].status === "Not Assigned" ? (
+              "Not Assigned"
+            ) : (
+              <ul style={{ listStyleType: "none", padding: 0 }}>
+                {listValues}
+              </ul>
+            ),
           assignedTo: responseData.teachers[i].assignedTo,
         });
-        console.log(data);
 
         originaldata.push({
           key: responseData.teachers[i].teacherId,
@@ -185,7 +187,7 @@ const AssignTeacherToCourse = () => {
       setTableData([...originData]);
     };
     getClasses();
-  }, []);
+  }, [editing]);
 
   const success = (message) => {
     messageApi.open({
@@ -202,41 +204,26 @@ const AssignTeacherToCourse = () => {
 
   //on Assingn Finish
   const onFinish = async (values) => {
-    // console.log(values);
     const record = tableRecord;
-    // console.log(record);
     let data = [];
-    const coursesId = [];
     const assignedTo = [];
     data.teacherId = record.key;
     data.teacherName = record.teacherName;
     Object.entries(values).forEach(([key, value]) => {
-      // console.log(key, value);
       if (String(key) === "grade") {
         data.grade = value;
       }
       if (String(key).slice(1) === "Courses") {
-        coursesId.push(value);
-      }
-      if (String(key).slice(-8) === "Sections") {
-        assignedTo.push({
-          coursesId: `${String(key).slice(1, 7)}`,
-          sections: value,
-        });
-        // data[`${String(key).slice(1, 7)}`] = value;
+        assignedTo.push(value);
       }
     });
-    data.coursesId = coursesId;
+    data.coursesId = record.coursesId;
     data.assignedTo = assignedTo;
     const { competitionalLevel } = originalData.find((data) => {
       return data.key === record.key;
     });
     data.competitionalLevel = competitionalLevel;
-    data.status =
-      // data.assignedTo[0].sections.length > 0 ?
-      "Assigned";
-    // : "Not Assigned";
-    // console.log(data);
+    data.status = assignedTo[0].length === 0 ? "Not Assigned" : "Assigned";
 
     try {
       await fetch("http://localhost:8080/teacher/teacherList", {
@@ -251,7 +238,7 @@ const AssignTeacherToCourse = () => {
           grade: data.grade,
           status: data.status,
           coursesId: data.coursesId,
-          assignedTo: data.assignedTo,
+          assignedTo: assignedTo,
         }),
       });
       success("Teacher Successfully Assigned");
@@ -260,21 +247,17 @@ const AssignTeacherToCourse = () => {
       return;
     }
 
-    const sectionsSet = assignedTo.map((obj) => ({
-      [obj.coursesId]: obj.sections.join(", "),
-    }));
+    const listValues = [];
+    for (let n = 0; n < assignedTo[0].length; n++) {
+      listValues.push(<li key={Math.random()}>{assignedTo[0][n]}</li>);
+    }
 
-    const listValues = sectionsSet.map((obj) => {
-      return (
-        <li key={Math.random()}>
-          {Object.keys(obj)[0]} : {Object.values(obj)[0]}
-        </li>
+    data.status =
+      assignedTo[0].length === 0 ? (
+        "Not Assigned"
+      ) : (
+        <ul style={{ listStyleType: "none", padding: 0 }}>{listValues}</ul>
       );
-    });
-
-    data.status = (
-      <ul style={{ listStyleType: "none", padding: 0 }}>{listValues}</ul>
-    );
     tableData.splice(tableData.indexOf(tableRecord), 1, data);
     setTableData([...tableData]);
     setEditing(false);
@@ -298,7 +281,7 @@ const AssignTeacherToCourse = () => {
       Assignable: true,
     },
     {
-      title: "Status",
+      title: "Assigned To",
       dataIndex: "status",
       width: "15%",
       editable: true,
@@ -335,13 +318,13 @@ const AssignTeacherToCourse = () => {
                 setContainerCss("OnAssignTeacherContainer");
                 const indexVal = originData.indexOf(record);
                 let theData = convertData(originalData[indexVal]);
+
                 let grade = theData.grade;
 
                 const gradeValues = grade.props.children.map(
                   (child, index) => child.props.children
                 );
 
-                // console.log(gradeValues);
                 let currentIndex = -1;
                 const result = [];
                 gradeValues.forEach((value) => {
@@ -349,14 +332,11 @@ const AssignTeacherToCourse = () => {
                     currentIndex++;
                     result[currentIndex] = { grade: value, courses: [] };
                   } else if (result[currentIndex]) {
-                    // console.log(value);
-                    let [course, ...sectionsString] = value;
-                    let sections = sectionsString;
-                    let courseObj = { course, sections };
+                    let [course] = value;
+                    let courseObj = { course };
                     result[currentIndex].courses.push(courseObj);
                   }
                 });
-                // console.log(result);
 
                 const courseDefaultValue = [];
                 const GradeCourseSection = [];
@@ -369,7 +349,9 @@ const AssignTeacherToCourse = () => {
                   const insideCourses = [];
                   for (let j = 0; j < result[i].courses.length; j++) {
                     for (let l = 0; l < courseData.length; l++) {
-                      if (result[i].grade === courseData[l].grade) {
+                      if (
+                        result[i].courses[j].course === courseData[l].courseId
+                      ) {
                         options.push({
                           courseName: courseData[l].courseName,
                           grade: result[i].grade,
@@ -394,7 +376,6 @@ const AssignTeacherToCourse = () => {
                     courses: courseForGradeInOne,
                   });
                 }
-
                 gradeDefaultValue.push(
                   <Form.Item
                     initialValue={grad}
@@ -409,7 +390,6 @@ const AssignTeacherToCourse = () => {
                       disabled
                       mode="multiple"
                       style={{ marginTop: -25 }}
-                      onChange={onGradeSelectChange}
                       placeholder="Select Grade">
                       <Option value="Grade 1">Grade 1</Option>
                       <Option value="Grade 2">Grade 2</Option>
@@ -423,67 +403,19 @@ const AssignTeacherToCourse = () => {
                   </Form.Item>
                 );
                 const gradeRender = [];
-                // console.log("options", options);
                 for (let i = 0; i < GradeCourseSection.length; i++) {
-                  const courseRender = [];
                   const option = [];
                   for (let j = 0; j < options.length; j++) {
                     if (options[j].grade === GradeCourseSection[i].grade) {
                       option.push(
-                        <Option value={`${options[j].courseId}`}>
+                        <Option
+                          key={Math.random()}
+                          value={`${options[j].courseId}`}>
                           {options[j].courseName}
                         </Option>
                       );
                     }
                   }
-                  for (
-                    let j = 0;
-                    j < GradeCourseSection[i].courses.length;
-                    j++
-                  ) {
-                    const checkedSections = [];
-                    for (
-                      let k = 0;
-                      k < GradeCourseSection[i].courses[j].sections.length;
-                      k++
-                    ) {
-                      checkedSections.push(
-                        GradeCourseSection[i].courses[j].sections[k]
-                      );
-                      // console.log("here");
-                    }
-                    // console.log(checkedSections);
-
-                    courseRender.push(
-                      <Form.Item
-                        initialValue={checkedSections}
-                        label={`${GradeCourseSection[i].grade} ${GradeCourseSection[i].courses[j].courseName} Sections`}
-                        style={{
-                          minWidth: 200,
-                          textAlign: "left",
-                          marginTop: -20,
-                        }}
-                        name={`${GradeCourseSection[i].grade.substring(6, 7)}${
-                          GradeCourseSection[i].courses[j].courses
-                        }Sections`}>
-                        <Checkbox.Group
-                          style={{
-                            width: "100%",
-                            marginTop: -10,
-                          }}
-                          onChange={onChangeCheckBox}>
-                          <Col>
-                            <Row>
-                              <Checkbox value="A">A</Checkbox>
-                              <Checkbox value="B">B</Checkbox>
-                              <Checkbox value="C">C</Checkbox>
-                            </Row>
-                          </Col>
-                        </Checkbox.Group>
-                      </Form.Item>
-                    );
-                  }
-                  // console.log(option);
                   gradeRender.push(
                     <>
                       <Form.Item
@@ -499,16 +431,14 @@ const AssignTeacherToCourse = () => {
                           7
                         )}Courses`}>
                         <Select
-                          disabled
+                          // disabled
                           mode="multiple"
                           allowClear
                           style={{ marginTop: -25 }}
-                          onChange={onCourseSelectChange}
                           placeholder="Select Courses">
                           {option}
                         </Select>
                       </Form.Item>
-                      {courseRender}
                     </>
                   );
                 }
@@ -557,37 +487,6 @@ const AssignTeacherToCourse = () => {
     },
   ];
 
-  //table columns end
-
-  //columns merge start
-
-  const mergedColumns = columns.map((col) => {
-    if (!col.editable) {
-      return col;
-    } else if (!col.Assignable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record) => ({
-        record,
-        inputType: col.dataIndex === "grade" ? "number" : "text",
-        dataIndex: col.dataIndex,
-        title: col.title,
-      }),
-    };
-  });
-  //on Grade Select Change
-  const onGradeSelectChange = (value) => {
-    // console.log(value);
-  };
-  const onCourseSelectChange = (value) => {
-    // console.log(value);
-  };
-  //on Change Checkbox
-  const onChangeCheckBox = (checkedValues) => {
-    // console.log("checked = ", checkedValues);
-  };
   //Delete handler
   const deleteCourse = (record) => {
     const indexValue = tableData.indexOf(record);
@@ -637,7 +536,7 @@ const AssignTeacherToCourse = () => {
                 style={{ marginTop: 15 }}
                 //   bordered
                 dataSource={tableData}
-                columns={mergedColumns}
+                columns={columns}
                 rowClassName="editable-row"
                 // pagination={{
                 //   onChange: deleteCourseGroup,
@@ -653,7 +552,7 @@ const AssignTeacherToCourse = () => {
                   style={{ marginTop: 15 }}
                   //   bordered
                   dataSource={tableData}
-                  columns={mergedColumns}
+                  columns={columns}
                   rowClassName="editable-row"
                   // pagination={{
                   //   onChange: deleteCourseGroup,

@@ -4,6 +4,7 @@ import AppRoute from "./Components/AppRoutes/AppRoute";
 import AppFooter from "./Components/Layout/AppFooter/AppFooter";
 import AppHeader from "./Components/Layout/AppHeader/AppHeader";
 import SideBar from "./Components/Layout/Sidebar/SideBar";
+import "./App.css";
 const { Content } = Layout;
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
   const setCollapsedHandler = (value) => {
     setCollapsed(value);
   };
+
   return (
     <div>
       <Layout
@@ -26,9 +28,9 @@ const App = () => {
           minHeight: "100vh",
           margin: "0",
         }}>
-        <SideBar collapsed={collapsed} />
+        <SideBar width={marginLeft} collapsed={collapsed} />
         <Layout
-          className="site-layout"
+          // className="site-layout"
           style={{
             marginLeft: marginLeft,
             backgroundColor: "#f7f7fa",
