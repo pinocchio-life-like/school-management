@@ -1,3 +1,25 @@
+#School Information and resource Planning
+
+![Screenshot (1964)](https://github.com/pinocchio-life-like/school-management/assets/103815611/95f05dbc-4230-4ea5-92b3-d33e3e452245)
+![Screenshot (1965)](https://github.com/pinocchio-life-like/school-management/assets/103815611/edb69e42-b951-4efd-af58-0a9e1fe99eaf)
+![Screenshot (1966)](https://github.com/pinocchio-life-like/school-management/assets/103815611/7dfc93c0-56db-42c3-8243-91658458a910)
+![Screenshot (1967)](https://github.com/pinocchio-life-like/school-management/assets/103815611/23e63936-b85c-4a2a-b9d6-30af01f05493)
+![Screenshot (1968)](https://github.com/pinocchio-life-like/school-management/assets/103815611/bc3c4ff5-6977-4209-b92a-ecaba0d17641)
+![Screenshot (1969)](https://github.com/pinocchio-life-like/school-management/assets/103815611/4260bff2-ef0b-4918-b295-db369cc3cae3)
+![Screenshot (1970)](https://github.com/pinocchio-life-like/school-management/assets/103815611/6b2a356c-39df-4d3a-8e44-aa6d1a754e00)
+![Screenshot (1971)](https://github.com/pinocchio-life-like/school-management/assets/103815611/f2533861-baf3-4179-9b4e-acce5ca0e7c4)
+![Screenshot (1972)](https://github.com/pinocchio-life-like/school-management/assets/103815611/a9965816-3385-44a7-8c09-ea7c906bf127)
+![Screenshot (1973)](https://github.com/pinocchio-life-like/school-management/assets/103815611/ea47b4bd-f10a-4fbe-a521-c0b5efd63b1e)
+![Screenshot (1974)](https://github.com/pinocchio-life-like/school-management/assets/103815611/3032f7fa-dfdf-444d-b13b-6bbc8ea08cf7)
+![Screenshot (1975)](https://github.com/pinocchio-life-like/school-management/assets/103815611/d5641959-6d7a-421c-b714-967d5a1ad75f)
+![Screenshot (1976)](https://github.com/pinocchio-life-like/school-management/assets/103815611/0f96a59f-6820-48ef-862a-1c3b0d898316)
+![Screenshot (1977)](https://github.com/pinocchio-life-like/school-management/assets/103815611/5458d053-e2f3-4b80-8baa-92e8a306872c)
+![Screenshot (1978)](https://github.com/pinocchio-life-like/school-management/assets/103815611/19a9621b-4b50-4510-8593-5545ed3ad4e4)
+![Screenshot (1979)](https://github.com/pinocchio-life-like/school-management/assets/103815611/3227f25f-6f2d-464b-b39d-50045d8bc0b0)
+![Screenshot (1980)](https://github.com/pinocchio-life-like/school-management/assets/103815611/13a6e4ac-328b-404f-9454-18beb1f67816)
+![Screenshot (1981)](https://github.com/pinocchio-life-like/school-management/assets/103815611/e7342b8e-7ef9-4ad4-8cc7-1cb7da3dce21)
+![Screenshot (1982)](https://github.com/pinocchio-life-like/school-management/assets/103815611/bf3cdf1f-6082-416e-a714-0214c4ec0dda)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
